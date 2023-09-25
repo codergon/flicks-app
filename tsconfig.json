@@ -2,11 +2,25 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "lib/*": ["lib/*"],
+      "utils/*": ["utils/*"],
+      "hooks/*": ["hooks/*"],
+      "assets": ["assets/*"],
+      "typings/*": ["types/*"],
+      "contexts/*": ["contexts/*"],
+      "helpers/*": ["helpers/*"],
+      "screens/*": ["screens/*"],
+      "constants/*": ["constants/*"],
+      "components/*": ["components/*"]
+    }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "contexts/AuthContext.tsxs"
   ]
 }
