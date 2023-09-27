@@ -18,9 +18,10 @@ import { LightText, RgText, Text } from "components/ui/typography";
 
 interface PostProps {
   isPaid?: boolean;
+  containsMedia?: boolean;
 }
 
-const Post = ({ isPaid = true }: PostProps) => {
+const Post = ({ isPaid = true, containsMedia = true }: PostProps) => {
   const data = [1, 2, 3];
   const scrollX = useRef(new Animated.Value(0)).current;
 
@@ -48,7 +49,7 @@ const Post = ({ isPaid = true }: PostProps) => {
           <View style={[styles.post_creatorAvatar]}>
             <Image
               style={[styles.post_creatorAvatar_image]}
-              source={require("assets/images/mock/4.png")}
+              source={require("assets/images/mock/1.png")}
               placeholder={
                 "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj["
               }
@@ -88,7 +89,7 @@ const Post = ({ isPaid = true }: PostProps) => {
         </LightText>
       </View>
 
-      {true && (
+      {containsMedia && (
         <View style={[styles.post_media]}>
           {!isPaid && (
             <View

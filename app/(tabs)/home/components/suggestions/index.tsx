@@ -40,7 +40,7 @@ const SuggestedAccounts = () => {
                 transition={300}
                 contentFit="cover"
                 style={[styles.backgroundImage]}
-                source={require("assets/images/mock/16.png")}
+                source={require("assets/images/mock/1.png")}
               />
 
               <LinearGradient
@@ -60,7 +60,7 @@ const SuggestedAccounts = () => {
                   >
                     <Image
                       style={[styles.creatorAvatar_image]}
-                      source={require("assets/images/mock/16.png")}
+                      source={require("assets/images/mock/1.png")}
                       placeholder={
                         "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj["
                       }

@@ -34,7 +34,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="home"
+      initialRouteName="discover"
       screenOptions={{
         headerShown: false,
         tabBarLabelStyle: {

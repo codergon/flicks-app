@@ -1,36 +1,79 @@
-import Post from "./components/post";
-import Topbar from "./components/topbar";
-import { Fragment, useRef } from "react";
+import { Fragment, useState } from "react";
+import { styles } from "./discover.styles";
+import Content from "./components/content";
+import SearchOverlay from "./searchOverlay";
 import { Container } from "components/ui/custom";
-import { View, FlatList, StyleSheet } from "react-native";
+import Searchbar from "components/common/Searchbar";
+import { RgText, Text } from "components/ui/typography";
+import { MagnifyingGlass } from "phosphor-react-native";
+import MasonryList from "@react-native-seoul/masonry-list";
+import { Keyboard, TouchableOpacity, View } from "react-native";
 
 const Discover = () => {
-  const ref = useRef<FlatList>(null);
-
-  function renderItem({ item, index }: { item: any; index: number }) {
-    return (
-      <Fragment>
-        <Post isPaid={index === 1} />
-      </Fragment>
-    );
-  }
+  const [search, setSearch] = useState("");
+  const [showResults, setShowResults] = useState(false);
 
   return (
     <Container>
-      <Topbar />
-
       <View
-        style={{
-          backgroundColor: "#f3f3f3",
-        }}
+        style={[
+          styles.header,
+          {
+            borderColor: "#ececec",
+            borderBottomWidth: true ? 0 : 1,
+          },
+        ]}
       >
-        <FlatList
-          ref={ref}
-          data={[1, 2, 3]}
-          renderItem={renderItem}
+        {true ? (
+          <Fragment>
+            <Searchbar
+              value={search}
+              onFocus={() => {
+                setShowResults(true);
+              }}
+              onChangeText={setSearch}
+            />
+            {showResults && (
+              <TouchableOpacity
+                onPress={() => {
+                  setShowResults(false);
+                  setSearch("");
+                  Keyboard.dismiss();
+                }}
+                style={styles.cancelSearch}
+              >
+                <RgText>Cancel</RgText>
+              </TouchableOpacity>
+            )}
+          </Fragment>
+        ) : (
+          <>
+            <Text style={[{ fontSize: 18 }]}>Discover</Text>
+            <MagnifyingGlass size={18} weight="bold" />
+          </>
+        )}
+      </View>
+
+      <View style={styles.discover_body}>
+        {showResults || 1 ? <SearchOverlay search={search} /> : null}
+
+        <MasonryList
+          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          numColumns={3}
+          renderItem={({ item, i }) => (
+            <Fragment>
+              <Content />
+            </Fragment>
+          )}
+          onEndReachedThreshold={0.1}
+          keyExtractor={(i) => i.toString()}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.container]}
+          contentContainerStyle={[styles.listContainer]}
+
+          // refreshing={isLoadingNext}
+          // onEndReached={() => loadNext(ITEM_CNT)}
+          // onRefresh={() => refetch({ first: ITEM_CNT })}
         />
       </View>
     </Container>
@@ -38,25 +81,3 @@ const Discover = () => {
 };
 
 export default Discover;
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    paddingBottom: 60,
-  },
-
-  loadingText: {
-    padding: 10,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  //
-  lottieView: {
-    top: 0,
-    left: 0,
-    right: 0,
-    position: "absolute",
-  },
-});

@@ -4,6 +4,7 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
+      "app/*": ["app/*"],
       "lib/*": ["lib/*"],
       "utils/*": ["utils/*"],
       "hooks/*": ["hooks/*"],

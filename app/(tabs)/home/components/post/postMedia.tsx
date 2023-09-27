@@ -29,7 +29,7 @@ const PostMedia = ({ item, index }: PostMediaProps) => {
       {!showVideo ? (
         <Image
           style={[styles.mediaImage]}
-          source={require("assets/images/mock/12.png")}
+          source={require("assets/images/mock/1.png")}
           placeholder={
             "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj["
           }

@@ -8,6 +8,7 @@ module.exports = function (api) {
         "module-resolver",
         {
           alias: {
+            app: "./app",
             lib: "./lib",
             utils: "./utils",
             hooks: "./hooks",

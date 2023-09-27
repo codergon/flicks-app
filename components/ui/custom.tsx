@@ -51,6 +51,7 @@ export function Container(
       style={[
         {
           flex: 1,
+          position: "relative",
           flexDirection: "column",
           paddingTop: insets.top,
         },
