@@ -1,14 +1,19 @@
 import * as React from "react";
-import { View } from "react-native";
 import MediaTab from "../_tabs/media";
 import Layout from "constants/Layout";
 import AllResults from "../_tabs/all";
 import PostsTab from "../_tabs/posts";
 import CreatorsTab from "../_tabs/creators";
+import { View, Animated } from "react-native";
 import { styles } from "./searchResults.styles";
 import { primaryColor } from "constants/Colors";
 import { RgText } from "components/ui/typography";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
+
+const av = new Animated.Value(0);
+av.addListener(() => {
+  return;
+});
 
 const renderScene = SceneMap({
   all: AllResults,
