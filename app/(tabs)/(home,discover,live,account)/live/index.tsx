@@ -1,15 +1,15 @@
 import { StyleSheet, View } from "react-native";
-import React from "react";
 import { Text } from "components/_ui/typography";
+import { Container } from "components/_ui/custom";
 
-const One = () => {
+const Live = () => {
   return (
-    <View>
-      <Text>One</Text>
-    </View>
+    <Container>
+      <Text>Live</Text>
+    </Container>
   );
 };
 
-export default One;
+export default Live;
 
 const styles = StyleSheet.create({});

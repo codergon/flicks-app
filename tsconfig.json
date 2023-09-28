@@ -5,16 +5,16 @@
     "baseUrl": ".",
     "paths": {
       "app/*": ["app/*"],
-      "lib/*": ["lib/*"],
-      "utils/*": ["utils/*"],
-      "hooks/*": ["hooks/*"],
+      "lib/*": ["src/lib/*"],
       "assets": ["assets/*"],
-      "typings/*": ["types/*"],
-      "contexts/*": ["contexts/*"],
-      "helpers/*": ["helpers/*"],
-      "screens/*": ["screens/*"],
-      "constants/*": ["constants/*"],
-      "components/*": ["components/*"]
+      "utils/*": ["src/utils/*"],
+      "hooks/*": ["src/hooks/*"],
+      "typings/*": ["src/types/*"],
+      "helpers/*": ["src/helpers/*"],
+      "layouts/*": ["src/layouts/*"],
+      "contexts/*": ["src/contexts/*"],
+      "constants/*": ["src/constants/*"],
+      "components/*": ["src/components/*"]
     }
   },
   "include": [

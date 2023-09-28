@@ -1,5 +1,5 @@
-import { View } from "components/ui/themed";
-import { Text } from "components/ui/typography";
+import { View } from "components/_ui/themed";
+import { Text } from "components/_ui/typography";
 import { StatusBar } from "expo-status-bar";
 import { Platform, StyleSheet } from "react-native";
 

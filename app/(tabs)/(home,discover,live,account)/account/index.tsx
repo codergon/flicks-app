@@ -1,15 +1,15 @@
 import { StyleSheet, View } from "react-native";
-import React from "react";
 import { Text } from "components/_ui/typography";
+import { Container } from "components/_ui/custom";
 
-const One = () => {
+const Account = () => {
   return (
-    <View>
-      <Text>One</Text>
-    </View>
+    <Container>
+      <Text>Account</Text>
+    </Container>
   );
 };
 
-export default One;
+export default Account;
 
 const styles = StyleSheet.create({});

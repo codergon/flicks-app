@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { View } from "react-native";
-import Colors from "../../constants/Colors";
-import Icons from "components/common/Icons";
+import Colors from "constants/Colors";
+import Icons from "components/_common/Icons";
 import useColorScheme from "hooks/useColorScheme";
 
 function TabBarIcon(props: { label: string; color: string }) {
@@ -53,15 +53,16 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="(home)"
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => <TabBarIcon label="home" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="discover"
+        name="(discover)"
         options={{
+          title: "Discover",
           tabBarIcon: ({ color }) => (
             <TabBarIcon label="discover" color={color} />
           ),
@@ -80,15 +81,17 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="live"
+        name="(live)"
         options={{
+          title: "Live",
           tabBarIcon: ({ color }) => <TabBarIcon label="live" color={color} />,
         }}
       />
 
       <Tabs.Screen
-        name="account"
+        name="(account)"
         options={{
+          title: "Account",
           tabBarIcon: ({ color }) => (
             <TabBarIcon label="account" color={color} />
           ),

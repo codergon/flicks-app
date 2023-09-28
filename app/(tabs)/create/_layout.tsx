@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import React from "react";
-import { Text } from "components/ui/typography";
+import { Text } from "components/_ui/typography";
 import { Slot } from "expo-router";
 
 const HomeLayout = () => {

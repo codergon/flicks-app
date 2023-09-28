@@ -15,6 +15,7 @@
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
     "@react-native-seoul/masonry-list": "^1.4.2",
+    "@react-navigation/material-top-tabs": "^6.6.4",
     "@react-navigation/native": "^6.0.2",
     "babel-plugin-module-resolver": "^5.0.0",
     "expo": "~49.0.11",
