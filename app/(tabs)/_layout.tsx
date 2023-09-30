@@ -1,8 +1,8 @@
-import { Tabs } from "expo-router";
-import { View } from "react-native";
 import Colors from "constants/Colors";
+import { Tabs, router } from "expo-router";
 import Icons from "components/_common/Icons";
 import useColorScheme from "hooks/useColorScheme";
+import { TouchableOpacity, View } from "react-native";
 
 function TabBarIcon(props: { label: string; color: string }) {
   return (
@@ -45,6 +45,7 @@ export default function TabLayout() {
           height: 84,
           paddingTop: 6,
           borderTopWidth: 1,
+          // justifyContent: "space-between",
           borderTopColor: Colors[colorScheme].tabBorder,
           backgroundColor: Colors[colorScheme].tabBackground,
         },
@@ -74,6 +75,28 @@ export default function TabLayout() {
         options={{
           // href: null, // hides this route
           title: "",
+          tabBarButton: (props) => {
+            return (
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                  router.push("/modals/upload-options");
+                }}
+                style={{
+                  flex: 1,
+                  minWidth: 25,
+                  paddingTop: 5,
+                  height: "100%",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  backgroundColor: "transparent",
+                }}
+              >
+                <Icons.Create size={30} color={"#000"} />
+              </TouchableOpacity>
+            );
+          },
           tabBarIcon: ({ color }) => (
             <TabBarIcon label="create" color={color} />
           ),

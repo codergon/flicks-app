@@ -16,7 +16,9 @@ const SuggestedAccounts = () => {
         </Text>
 
         <TouchableOpacity
-          onPress={() => router.push("/(tabs)/home/suggestedAccounts")}
+          onPress={() => {
+            router.push("/(tabs)/home/suggestedAccounts");
+          }}
           style={styles.expandBtn}
         >
           <ChevronRight size={20} color="#000" strokeWidth={2.4} />
