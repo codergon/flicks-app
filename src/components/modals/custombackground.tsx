@@ -33,7 +33,6 @@ const CustomBackground: React.FC<BottomSheetBackgroundProps> = ({
         containerStyle,
         {
           borderRadius: 16,
-          backgroundColor: "red",
         },
       ]}
     />

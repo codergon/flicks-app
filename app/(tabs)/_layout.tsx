@@ -1,7 +1,8 @@
+import { Tabs } from "expo-router";
 import Colors from "constants/Colors";
-import { Tabs, router } from "expo-router";
 import Icons from "components/_common/Icons";
 import useColorScheme from "hooks/useColorScheme";
+import { useModals } from "contexts/ModalsContext";
 import { TouchableOpacity, View } from "react-native";
 
 function TabBarIcon(props: { label: string; color: string }) {
@@ -31,6 +32,7 @@ function TabBarIcon(props: { label: string; color: string }) {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { openCreateContentModal } = useModals();
 
   return (
     <Tabs
@@ -45,7 +47,6 @@ export default function TabLayout() {
           height: 84,
           paddingTop: 6,
           borderTopWidth: 1,
-          // justifyContent: "space-between",
           borderTopColor: Colors[colorScheme].tabBorder,
           backgroundColor: Colors[colorScheme].tabBackground,
         },
@@ -80,7 +81,7 @@ export default function TabLayout() {
               <TouchableOpacity
                 activeOpacity={1}
                 onPress={() => {
-                  router.push("/modals/upload-options");
+                  openCreateContentModal();
                 }}
                 style={{
                   flex: 1,

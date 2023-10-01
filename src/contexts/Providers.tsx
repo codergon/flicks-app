@@ -1,6 +1,7 @@
 import "react-native-gesture-handler";
 
 import dayjs from "dayjs";
+import ModalsProvider from "./ModalsContext";
 import duration from "dayjs/plugin/duration";
 import AppContextProvider from "./AppContext";
 import AccountProvider from "./AccountContext";
@@ -19,7 +20,9 @@ export const Providers = ({
     <SettingsProvider>
       <AccountProvider>
         <AppContextProvider>
-          <SafeAreaProvider>{children}</SafeAreaProvider>
+          <ModalsProvider>
+            <SafeAreaProvider>{children}</SafeAreaProvider>
+          </ModalsProvider>
         </AppContextProvider>
       </AccountProvider>
     </SettingsProvider>

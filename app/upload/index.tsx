@@ -2,14 +2,14 @@ import { StyleSheet, View } from "react-native";
 import { Text } from "components/_ui/typography";
 import { Container } from "components/_ui/custom";
 
-const Create = () => {
+const Upload = () => {
   return (
     <Container>
-      <Text>Create</Text>
+      <Text>Uploading</Text>
     </Container>
   );
 };
 
-export default Create;
+export default Upload;
 
 const styles = StyleSheet.create({});
