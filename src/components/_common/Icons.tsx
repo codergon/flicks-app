@@ -9,6 +9,26 @@ interface IconProps extends ViewProps {
 }
 
 const Icons = {
+  Rotate: ({ color = "#000", size = 19 }) => {
+    return (
+      <Svg
+        viewBox="0 0 30 32"
+        style={{
+          width: size,
+          height: size * (32 / 30),
+        }}
+      >
+        <Path
+          fill={color}
+          stroke={color}
+          strokeWidth={0}
+          strokeLinejoin="round"
+          d="M4 30h12a2.002 2.002 0 0 0 2-2V16a2.002 2.002 0 0 0-2-2H4a2.002 2.002 0 0 0-2 2v12a2.002 2.002 0 0 0 2 2Zm12-14v12H3.999L4 16h12Zm1-14 1.41 1.41L15.83 6H21a7.008 7.008 0 0 1 7 7v5h-2v-5a5.006 5.006 0 0 0-5-5h-5.17l2.58 2.59L17 12l-5-5 5-5Z"
+        />
+      </Svg>
+    );
+  },
+
   Home: ({ color = "#999DA3", size = 19 }) => {
     return (
       <Svg

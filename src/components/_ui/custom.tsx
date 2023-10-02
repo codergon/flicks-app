@@ -37,10 +37,18 @@ export function SafeAreaView(props: SafeAreaViewProps & ThemeProps) {
 export function Container(
   props: ViewProps & {
     paddingTop?: number;
+    offsetBottom?: boolean;
   }
 ) {
   const insets = useSafeAreaInsets();
-  const { style, lightColor, darkColor, paddingTop, ...otherProps } = props;
+  const {
+    style,
+    lightColor,
+    darkColor,
+    paddingTop,
+    offsetBottom,
+    ...otherProps
+  } = props;
 
   return (
     <View
@@ -54,6 +62,7 @@ export function Container(
           position: "relative",
           flexDirection: "column",
           paddingTop: insets.top,
+          ...(offsetBottom && { paddingBottom: insets.bottom }),
         },
         style,
       ]}
