@@ -17,10 +17,15 @@ import { Animated, FlatList, TouchableOpacity, View } from "react-native";
 
 interface PostProps {
   isPaid?: boolean;
+  showBorder?: boolean;
   containsMedia?: boolean;
 }
 
-const Post = ({ isPaid = true, containsMedia = true }: PostProps) => {
+const Post = ({
+  isPaid = true,
+  containsMedia = true,
+  showBorder,
+}: PostProps) => {
   const data = [1, 2, 3];
   const scrollX = useRef(new Animated.Value(0)).current;
 
@@ -39,6 +44,8 @@ const Post = ({ isPaid = true, containsMedia = true }: PostProps) => {
       style={[
         styles.post,
         {
+          borderBottomWidth: showBorder ? 1 : 0,
+          borderBottomColor: "#ebebeb",
           backgroundColor: "#fff",
         },
       ]}
@@ -161,43 +168,45 @@ const Post = ({ isPaid = true, containsMedia = true }: PostProps) => {
         </View>
 
         {/* Ellipses indicating current media item */}
-        <View style={[styles.post_mediaDots]}>
-          {data?.map((_, index) => {
-            const dotWidth = scrollX.interpolate({
-              inputRange: [
-                (index - 1) * Layout.window.width,
-                index * Layout.window.width,
-                (index + 1) * Layout.window.width,
-              ],
-              outputRange: [6, 12, 6],
-              extrapolate: "clamp",
-            });
+        {containsMedia && (
+          <View style={[styles.post_mediaDots]}>
+            {data?.map((_, index) => {
+              const dotWidth = scrollX.interpolate({
+                inputRange: [
+                  (index - 1) * Layout.window.width,
+                  index * Layout.window.width,
+                  (index + 1) * Layout.window.width,
+                ],
+                outputRange: [6, 12, 6],
+                extrapolate: "clamp",
+              });
 
-            const backgroundColor = scrollX.interpolate({
-              inputRange: [
-                (index - 1) * Layout.window.width,
-                index * Layout.window.width,
-                (index + 1) * Layout.window.width,
-              ],
-              outputRange: ["#ddd", primaryColor, "#ddd"],
-              extrapolate: "clamp",
-            });
+              const backgroundColor = scrollX.interpolate({
+                inputRange: [
+                  (index - 1) * Layout.window.width,
+                  index * Layout.window.width,
+                  (index + 1) * Layout.window.width,
+                ],
+                outputRange: ["#ddd", primaryColor, "#ddd"],
+                extrapolate: "clamp",
+              });
 
-            return (
-              <Animated.View
-                key={index}
-                style={[
-                  styles.post_mediaDot,
-                  {
-                    width: dotWidth,
-                    backgroundColor:
-                      index === currentIndex ? primaryColor : "#ddd",
-                  },
-                ]}
-              />
-            );
-          })}
-        </View>
+              return (
+                <Animated.View
+                  key={index}
+                  style={[
+                    styles.post_mediaDot,
+                    {
+                      width: dotWidth,
+                      backgroundColor:
+                        index === currentIndex ? primaryColor : "#ddd",
+                    },
+                  ]}
+                />
+              );
+            })}
+          </View>
+        )}
 
         <View style={[styles.post_actions]}>
           <View style={[styles.post_action]}>

@@ -52,7 +52,7 @@ const Creator = ({ item, size, badge }: CreatorProps) => {
         />
       </View>
       <View style={[styles.creatorInfo]}>
-        <Text style={[styles.creatorInfo__name]}>pixels.sol</Text>
+        <Text style={[styles.creatorInfo__name]}>Rissa</Text>
         <RgText
           style={[
             styles.creatorInfo__desc,

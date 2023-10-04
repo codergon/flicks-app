@@ -13,8 +13,8 @@ import CreateContentModal from "components/modals/create-content";
 export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
-  // initialRouteName: "(tabs)",
-  initialRouteName: "upload",
+  initialRouteName: "(tabs)",
+  // initialRouteName: "upload",
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -54,8 +54,8 @@ function RootLayoutNav() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Fragment>
           <Stack
-            initialRouteName="upload"
-            // initialRouteName="(tabs)"
+            // initialRouteName="upload"
+            initialRouteName="(tabs)"
             screenOptions={{ headerShown: false }}
           >
             <Stack.Screen name="index" redirect />

@@ -30,13 +30,17 @@ function TabBarIcon(props: { label: string; color: string }) {
   );
 }
 
+export const unstable_settings = {
+  initialRouteName: "(home)/2345",
+};
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { openCreateContentModal } = useModals();
 
   return (
     <Tabs
-      initialRouteName="discover"
+      initialRouteName="(home)/2345"
       screenOptions={{
         headerShown: false,
         tabBarLabelStyle: {
