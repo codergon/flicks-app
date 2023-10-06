@@ -1,7 +1,7 @@
 import Post from "components/shared/post";
 import { FlatList, StyleSheet, View } from "react-native";
 
-const ProfilieUpcomingStreams = () => {
+const ProfileUpcomingStreams = () => {
   const data = [1, 2, 3, 4, 5, 6];
   return (
     <View style={[styles.upcoming]}>
@@ -25,7 +25,7 @@ const ProfilieUpcomingStreams = () => {
   );
 };
 
-export default ProfilieUpcomingStreams;
+export default ProfileUpcomingStreams;
 
 const styles = StyleSheet.create({
   upcoming: {

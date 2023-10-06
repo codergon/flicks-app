@@ -1,17 +1,22 @@
 import { Fragment } from "react";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import { ArrowLeft, MoreHorizontal } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ProfileHeaderBtns = () => {
   const inset = useSafeAreaInsets();
+  const [_, segment] = useSegments();
 
   return (
     <Fragment>
       <TouchableOpacity
         onPress={() => {
-          router.back();
+          router.canGoBack()
+            ? router.back()
+            : router.replace(
+                `/(tabs)/${segment}/${segment.substring(1, segment.length - 1)}`
+              );
         }}
         style={[
           styles.btn,

@@ -1,10 +1,10 @@
 import Post from "components/shared/post";
 import { FlatList, StyleSheet, View } from "react-native";
 
-const PostsTab = () => {
+const AccountPostsTab = () => {
   const data = [1, 2, 3, 4, 5, 6];
   return (
-    <View style={[styles.creators_results]}>
+    <View style={[styles.posts]}>
       <FlatList
         data={data}
         showsVerticalScrollIndicator={false}
@@ -25,10 +25,10 @@ const PostsTab = () => {
   );
 };
 
-export default PostsTab;
+export default AccountPostsTab;
 
 const styles = StyleSheet.create({
-  creators_results: {
+  posts: {
     flex: 1,
     gap: 14,
     flexDirection: "column",

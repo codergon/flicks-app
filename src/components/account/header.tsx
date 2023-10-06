@@ -5,30 +5,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ArrowLeft, MoreHorizontal, Pencil, X } from "lucide-react-native";
 import { Gear } from "phosphor-react-native";
 
-const ProfileHeaderBtns = () => {
+const AccountHeaderBtns = () => {
   const inset = useSafeAreaInsets();
 
   return (
     <Fragment>
       <TouchableOpacity
-        onPress={() => {
-          router.back();
-        }}
-        style={[
-          styles.btn,
-          {
-            left: 16,
-            top: 10 + inset.top,
-          },
-        ]}
-      >
-        <ArrowLeft size={18} color="#fff" />
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          router.back();
-        }}
+        onPress={() => {}}
         style={[
           styles.btn,
           {
@@ -45,7 +28,7 @@ const ProfileHeaderBtns = () => {
   );
 };
 
-export default ProfileHeaderBtns;
+export default AccountHeaderBtns;
 
 const styles = StyleSheet.create({
   btn: {

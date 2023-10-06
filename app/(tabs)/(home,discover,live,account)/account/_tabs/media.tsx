@@ -1,7 +1,7 @@
 import Post from "components/shared/post";
 import { FlatList, StyleSheet, View } from "react-native";
 
-const MediaTab = () => {
+const AccountMediaTab = () => {
   return (
     <View style={[styles.media_tab]}>
       <FlatList
@@ -18,7 +18,7 @@ const MediaTab = () => {
   );
 };
 
-export default MediaTab;
+export default AccountMediaTab;
 
 const styles = StyleSheet.create({
   media_tab: {

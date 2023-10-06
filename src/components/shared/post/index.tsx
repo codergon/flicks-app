@@ -14,6 +14,7 @@ import Creator from "components/shared/creator";
 import { primaryColor } from "constants/Colors";
 import { LightText, RgText, Text } from "components/_ui/typography";
 import { Animated, FlatList, TouchableOpacity, View } from "react-native";
+import { useModals } from "contexts/ModalsContext";
 
 interface PostProps {
   isPaid?: boolean;
@@ -28,6 +29,8 @@ const Post = ({
 }: PostProps) => {
   const data = [1, 2, 3];
   const scrollX = useRef(new Animated.Value(0)).current;
+
+  const { openPostIntractionsModal } = useModals();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const handleViewableItemsChanged = useRef(
@@ -151,70 +154,87 @@ const Post = ({
         </View>
       )}
 
-      <View style={[styles.post_footer]}>
-        <View style={[styles.post_stats]}>
-          {/* <View style={[styles.post_statsItem]}>
+      {!isPaid && (
+        <View style={[styles.post_footer]}>
+          <View style={[styles.post_stats]}>
+            {/* <View style={[styles.post_statsItem]}>
             <Heart size={15} color="#000" strokeWidth={2} />
             <RgText style={[styles.post_statsItemText]}>16</RgText>
           </View> */}
-          <View style={[styles.post_statsItem]}>
-            <MessageCircle size={15} color="#000" strokeWidth={2} />
-            <RgText style={[styles.post_statsItemText]}>33k</RgText>
+            <TouchableOpacity
+              onPress={() => {
+                openPostIntractionsModal({
+                  type: "comments",
+                  data: {
+                    numOfComments: 3,
+                  },
+                });
+              }}
+              style={[styles.post_statsItem]}
+            >
+              <MessageCircle size={15} color="#000" strokeWidth={2} />
+              <RgText style={[styles.post_statsItemText]}>33k</RgText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                //
+              }}
+              style={[styles.post_statsItem]}
+            >
+              <CircleDollarSign size={15} color="#000" strokeWidth={1.9} />
+              <RgText style={[styles.post_statsItemText]}>35</RgText>
+            </TouchableOpacity>
           </View>
-          <View style={[styles.post_statsItem]}>
-            <CircleDollarSign size={15} color="#000" strokeWidth={1.9} />
-            <RgText style={[styles.post_statsItemText]}>35</RgText>
+
+          {/* Ellipses indicating current media item */}
+          {containsMedia && (
+            <View style={[styles.post_mediaDots]}>
+              {data?.map((_, index) => {
+                const dotWidth = scrollX.interpolate({
+                  inputRange: [
+                    (index - 1) * Layout.window.width,
+                    index * Layout.window.width,
+                    (index + 1) * Layout.window.width,
+                  ],
+                  outputRange: [6, 12, 6],
+                  extrapolate: "clamp",
+                });
+
+                const backgroundColor = scrollX.interpolate({
+                  inputRange: [
+                    (index - 1) * Layout.window.width,
+                    index * Layout.window.width,
+                    (index + 1) * Layout.window.width,
+                  ],
+                  outputRange: ["#ddd", primaryColor, "#ddd"],
+                  extrapolate: "clamp",
+                });
+
+                return (
+                  <Animated.View
+                    key={index}
+                    style={[
+                      styles.post_mediaDot,
+                      {
+                        width: dotWidth,
+                        backgroundColor:
+                          index === currentIndex ? primaryColor : "#ddd",
+                      },
+                    ]}
+                  />
+                );
+              })}
+            </View>
+          )}
+
+          <View style={[styles.post_actions]}>
+            <View style={[styles.post_action]}>
+              {/* <Share size={16} color="#000" strokeWidth={2} /> */}
+              <Gift size={16} color="#000" strokeWidth={2} />
+            </View>
           </View>
         </View>
-
-        {/* Ellipses indicating current media item */}
-        {containsMedia && (
-          <View style={[styles.post_mediaDots]}>
-            {data?.map((_, index) => {
-              const dotWidth = scrollX.interpolate({
-                inputRange: [
-                  (index - 1) * Layout.window.width,
-                  index * Layout.window.width,
-                  (index + 1) * Layout.window.width,
-                ],
-                outputRange: [6, 12, 6],
-                extrapolate: "clamp",
-              });
-
-              const backgroundColor = scrollX.interpolate({
-                inputRange: [
-                  (index - 1) * Layout.window.width,
-                  index * Layout.window.width,
-                  (index + 1) * Layout.window.width,
-                ],
-                outputRange: ["#ddd", primaryColor, "#ddd"],
-                extrapolate: "clamp",
-              });
-
-              return (
-                <Animated.View
-                  key={index}
-                  style={[
-                    styles.post_mediaDot,
-                    {
-                      width: dotWidth,
-                      backgroundColor:
-                        index === currentIndex ? primaryColor : "#ddd",
-                    },
-                  ]}
-                />
-              );
-            })}
-          </View>
-        )}
-
-        <View style={[styles.post_actions]}>
-          <View style={[styles.post_action]}>
-            {/* <Share size={16} color="#000" strokeWidth={2} /> */}
-            <Gift size={16} color="#000" strokeWidth={2} />
-          </View>
-        </View>
-      </View>
+      )}
     </View>
   );
 };

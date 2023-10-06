@@ -2,6 +2,11 @@ import { padding } from "helpers/styles";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  subscribeContainer: {
+    width: "100%",
+    marginTop: 30,
+  },
+
   container: {
     flex: 1,
     width: "100%",
@@ -46,22 +51,21 @@ const styles = StyleSheet.create({
 
   info_actions: {
     flex: 1,
+    paddingTop: 4,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
   },
 
   creatorInfo: {
-    gap: 8,
+    gap: 4,
     flexDirection: "column",
   },
   creatorInfo__name: {
     fontSize: 16,
-    lineHeight: 16,
   },
   creatorInfo__desc: {
     fontSize: 12,
-    lineHeight: 12,
   },
 
   actionBtns: {

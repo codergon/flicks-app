@@ -12,6 +12,7 @@ import LottieView from "lottie-react-native";
 import { Container } from "components/_ui/custom";
 import { Fragment, useEffect, useRef, useState } from "react";
 import SuggestedAccounts from "components/shared/suggestions";
+import { StatusBar } from "expo-status-bar";
 
 const loadingAnimation = require("assets/lotties/loading.json");
 
@@ -80,6 +81,8 @@ const Home = () => {
 
   return (
     <Container>
+      <StatusBar style="dark" />
+
       {/* Top bar */}
       <Topbar />
 

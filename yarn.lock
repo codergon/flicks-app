@@ -3963,6 +3963,11 @@ expo-router@^2.0.0:
     schema-utils "^4.0.1"
     url "^0.11.0"
 
+expo-screen-capture@~5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/expo-screen-capture/-/expo-screen-capture-5.3.0.tgz#c28586eaefccadb48e65dbdc05d5edef31c1094b"
+  integrity sha512-+4JUbwcqiwrwV1xdmfeDI2xdrTh62e34XqBad2waQrZ6d+P7TRx8xGPauOPUyEjUSghgGJvvgkQmaL2HMTKv9w==
+
 expo-secure-store@~12.3.1:
   version "12.3.1"
   resolved "https://registry.yarnpkg.com/expo-secure-store/-/expo-secure-store-12.3.1.tgz#7e5ba94f6e7374f132108c9feb5cc811568f3db6"

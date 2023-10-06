@@ -46,22 +46,21 @@ const styles = StyleSheet.create({
 
   info_actions: {
     flex: 1,
+    paddingTop: 4,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
   },
 
   creatorInfo: {
-    gap: 8,
+    gap: 4,
     flexDirection: "column",
   },
   creatorInfo__name: {
     fontSize: 16,
-    lineHeight: 16,
   },
   creatorInfo__desc: {
     fontSize: 12,
-    lineHeight: 12,
   },
 
   actionBtns: {
@@ -80,6 +79,42 @@ const styles = StyleSheet.create({
     marginTop: 12,
     flexDirection: "row",
     paddingHorizontal: 16,
+  },
+
+  // account stats
+  accountStats: {
+    gap: 10,
+    width: "100%",
+    marginTop: 6,
+    paddingTop: 10,
+    paddingBottom: 14,
+    flexDirection: "column",
+  },
+  stats_row: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    justifyContent: "space-between",
+  },
+
+  stats_group: {
+    gap: 18,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  statBtn_cover: {
+    // alignItems: "center",
+    flexDirection: "column",
+  },
+  statBtn: {
+    gap: 8,
+    borderRadius: 32,
+    paddingVertical: 9,
+    paddingHorizontal: 11,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
   },
 });
 

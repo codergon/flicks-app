@@ -36,6 +36,9 @@ const CreateContentModal = () => {
       ref={createContentRef}
       enablePanDownToClose
       snapPoints={snapPoints}
+      handleIndicatorStyle={{
+        backgroundColor: "rgba(0,0,0,0.2)",
+      }}
       backdropComponent={(props: BottomSheetBackdropProps) => (
         <BottomSheetBackdrop
           {...props}

@@ -156,21 +156,23 @@ const styles = StyleSheet.create({
 
   // Post footer
   post_footer: {
-    ...padding(13, 16),
-    flexDirection: "row",
     alignItems: "center",
     position: "relative",
+    flexDirection: "row",
+    ...padding(9, 16, 13),
     justifyContent: "center",
   },
   // Post stats
   post_stats: {
-    gap: 16,
+    gap: 10,
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
   },
   post_statsItem: {
     gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
     flexDirection: "row",
     alignItems: "center",
   },

@@ -31,7 +31,7 @@ function TabBarIcon(props: { label: string; color: string }) {
 }
 
 export const unstable_settings = {
-  initialRouteName: "(home)/2345",
+  initialRouteName: "(home)",
 };
 
 export default function TabLayout() {
@@ -40,7 +40,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="(home)/2345"
+      initialRouteName="(home)"
       screenOptions={{
         headerShown: false,
         tabBarLabelStyle: {

@@ -9,13 +9,9 @@ import { Providers } from "contexts/Providers";
 import { SplashScreen, Stack } from "expo-router";
 import useColorScheme from "hooks/useColorScheme";
 import CreateContentModal from "components/modals/create-content";
+import PostInteractionsModal from "components/modals/post-interactions";
 
 export { ErrorBoundary } from "expo-router";
-
-export const unstable_settings = {
-  initialRouteName: "(tabs)",
-  // initialRouteName: "upload",
-};
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -46,6 +42,11 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
+export const unstable_settings = {
+  // initialRouteName: "(tabs)",
+  initialRouteName: "upload",
+};
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
@@ -54,8 +55,8 @@ function RootLayoutNav() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Fragment>
           <Stack
-            // initialRouteName="upload"
-            initialRouteName="(tabs)"
+            initialRouteName="upload"
+            // initialRouteName="(tabs)"
             screenOptions={{ headerShown: false }}
           >
             <Stack.Screen name="index" redirect />
@@ -64,6 +65,7 @@ function RootLayoutNav() {
           </Stack>
 
           <CreateContentModal />
+          <PostInteractionsModal />
         </Fragment>
       </ThemeProvider>
     </Providers>

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image } from "expo-image";
 import styles from "./profile.styles";
 import Layout from "constants/Layout";
 import { padding } from "helpers/styles";
-import { Gift, Pencil } from "lucide-react-native";
+import { StatusBar } from "expo-status-bar";
 import { primaryColor } from "constants/Colors";
 import { useLocalSearchParams } from "expo-router";
 import { RgText, Text } from "components/_ui/typography";
@@ -14,8 +14,10 @@ import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 import PostsTab from "./_tabs/posts";
 import MediaGallery from "./_tabs/gallery";
 import ProfileWishlist from "./_tabs/wishlist";
-import ProfilieUpcomingStreams from "./_tabs/upcoming";
-import { StatusBar } from "expo-status-bar";
+import ProfileUpcomingStreams from "./_tabs/upcoming";
+import SuggestedAccounts from "components/shared/suggestions";
+
+import * as ScreenCapture from "expo-screen-capture";
 
 const av = new Animated.Value(0);
 av.addListener(() => {
@@ -25,7 +27,7 @@ av.addListener(() => {
 const renderScene = SceneMap({
   posts: PostsTab,
   media: MediaGallery,
-  upcoming: ProfilieUpcomingStreams,
+  upcoming: ProfileUpcomingStreams,
   wishlist: ProfileWishlist,
 });
 
@@ -51,6 +53,17 @@ const UserProfile = () => {
       <RgText>Loading {route.title}…</RgText>
     </View>
   );
+
+  // Prevent screenshots & screen recordings
+  ScreenCapture.usePreventScreenCapture();
+  useEffect(() => {
+    (async () => await ScreenCapture.preventScreenCaptureAsync())();
+
+    const subscription = ScreenCapture.addScreenshotListener(() => {
+      alert("Screenshots are not allowed on this screen.");
+    });
+    return () => subscription.remove();
+  }, []);
 
   return (
     <View
@@ -145,60 +158,97 @@ const UserProfile = () => {
 
         <View style={[styles.bio]}>
           <RgText>
-            Really outer space! The whole thing. It’s all outer space 🌌🌍
+            I’m a photographer and videographer based in New York City 📷📹
           </RgText>
         </View>
       </View>
 
       {/* Tabs */}
-      <View style={[styles.container]}>
-        <TabView
-          lazy
-          onIndexChange={setIndex}
-          renderScene={renderScene}
-          navigationState={{ index, routes }}
-          initialLayout={{ width: Layout.window.width }}
-          renderLazyPlaceholder={_renderLazyPlaceholder}
-          sceneContainerStyle={{
-            borderWidth: 0,
-            borderTopWidth: 1,
-            borderColor: "#ececec",
-          }}
-          renderTabBar={(props) => (
-            <TabBar
-              {...props}
-              indicatorStyle={{
-                height: 2,
-                backgroundColor: primaryColor,
-              }}
-              tabStyle={{
-                width: "auto",
-                paddingHorizontal: 4,
-              }}
-              gap={24}
-              contentContainerStyle={{
-                width: Layout.window.width - 32,
-              }}
-              style={{
-                height: 44,
-                marginLeft: 16,
-                width: Layout.window.width - 32,
-                backgroundColor: "transparent",
-              }}
-              renderLabel={({ route, focused, color }) => (
-                <RgText
-                  style={{
-                    fontSize: 14,
-                    color: focused ? "#000" : "#888",
-                  }}
-                >
-                  {route.title}
-                </RgText>
-              )}
-            />
-          )}
-        />
-      </View>
+      {!true ? (
+        <View style={[styles.container]}>
+          <TabView
+            lazy
+            onIndexChange={setIndex}
+            renderScene={renderScene}
+            navigationState={{ index, routes }}
+            initialLayout={{ width: Layout.window.width }}
+            renderLazyPlaceholder={_renderLazyPlaceholder}
+            sceneContainerStyle={{
+              borderWidth: 0,
+              borderTopWidth: 1,
+              borderColor: "#ececec",
+            }}
+            renderTabBar={(props) => (
+              <TabBar
+                {...props}
+                indicatorStyle={{
+                  height: 2,
+                  backgroundColor: primaryColor,
+                }}
+                tabStyle={{
+                  width: "auto",
+                  paddingHorizontal: 4,
+                }}
+                gap={24}
+                contentContainerStyle={{
+                  width: Layout.window.width - 32,
+                }}
+                style={{
+                  height: 44,
+                  marginLeft: 16,
+                  width: Layout.window.width - 32,
+                  backgroundColor: "#fff", // transparent causes shadow issues & warnings
+                }}
+                renderLabel={({ route, focused, color }) => (
+                  <RgText
+                    style={{
+                      fontSize: 14,
+                      color: focused ? "#000" : "#888",
+                    }}
+                  >
+                    {route.title}
+                  </RgText>
+                )}
+              />
+            )}
+          />
+        </View>
+      ) : (
+        <View style={[styles.subscribeContainer]}>
+          <View
+            style={{
+              marginBottom: 20,
+              paddingHorizontal: 16,
+            }}
+          >
+            <TouchableOpacity
+              style={[
+                {
+                  width: "100%",
+                  borderRadius: 10,
+                  paddingVertical: 10,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: primaryColor,
+                },
+              ]}
+            >
+              <RgText
+                style={[
+                  {
+                    fontSize: 16,
+                    color: "#fff",
+                  },
+                ]}
+              >
+                Subscribe for free
+              </RgText>
+            </TouchableOpacity>
+          </View>
+
+          <SuggestedAccounts />
+        </View>
+      )}
     </View>
   );
 };

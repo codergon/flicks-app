@@ -10,9 +10,13 @@ const ProfileWishlist = () => {
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item, index }) => {
-          return <ProfileWishItem item={item} />;
+          return <ProfileWishItem item={item} fulfilled={index % 2 === 1} />;
         }}
-        contentContainerStyle={{ paddingVertical: 16, gap: 20 }}
+        contentContainerStyle={{
+          gap: 14,
+          paddingVertical: 16,
+          paddingHorizontal: 16,
+        }}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>

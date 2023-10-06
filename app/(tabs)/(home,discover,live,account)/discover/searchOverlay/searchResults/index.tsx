@@ -64,7 +64,7 @@ const SearchResults = () => {
               height: 44,
               borderBottomWidth: 1,
               borderBottomColor: "#ececec",
-              backgroundColor: "transparent",
+              backgroundColor: "#fff",
             }}
             renderLabel={({ route, focused, color }) => (
               <RgText
