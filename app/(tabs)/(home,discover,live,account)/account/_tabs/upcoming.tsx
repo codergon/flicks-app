@@ -1,6 +1,7 @@
 import { Text } from "components/_ui/typography";
 import LiveStreamItem from "components/account/streamItem";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { Tabs } from "react-native-collapsible-tab-view";
 
 const AccountUpcomingStreams = () => {
   const data = [
@@ -15,7 +16,7 @@ const AccountUpcomingStreams = () => {
   ];
 
   return (
-    <ScrollView
+    <Tabs.ScrollView
       style={[styles.ongoingStreams]}
       contentContainerStyle={{
         paddingTop: 0,
@@ -75,7 +76,7 @@ const AccountUpcomingStreams = () => {
           </View>
         );
       })}
-    </ScrollView>
+    </Tabs.ScrollView>
   );
 };
 

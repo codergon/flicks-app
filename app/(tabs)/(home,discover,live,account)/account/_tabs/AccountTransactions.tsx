@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View } from "react-native";
+import { Tabs } from "react-native-collapsible-tab-view";
 import AccountTransactionItem from "components/account/transactionItem";
 
 const AccountTransactons = () => {
@@ -74,35 +74,26 @@ const AccountTransactons = () => {
   ];
 
   return (
-    <View style={[styles.wishlist]}>
-      <FlatList
-        data={data}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item, index }) => {
-          return (
-            <AccountTransactionItem
-              item={item}
-              showBorder={index !== data.length - 1}
-            />
-          );
-        }}
-        contentContainerStyle={{
-          paddingTop: 16,
-          paddingBottom: 24,
-          paddingHorizontal: 16,
-        }}
-        keyExtractor={(item, index) => index.toString()}
-      />
-    </View>
+    <Tabs.FlatList
+      data={data}
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
+      renderItem={({ item, index }) => {
+        return (
+          <AccountTransactionItem
+            item={item}
+            showBorder={index !== data.length - 1}
+          />
+        );
+      }}
+      contentContainerStyle={{
+        paddingTop: 10,
+        paddingBottom: 24,
+        paddingHorizontal: 16,
+      }}
+      keyExtractor={(item, index) => index.toString()}
+    />
   );
 };
 
 export default AccountTransactons;
-
-const styles = StyleSheet.create({
-  wishlist: {
-    flex: 1,
-    flexDirection: "column",
-  },
-});

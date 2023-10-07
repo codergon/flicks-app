@@ -2,6 +2,7 @@ import AccountWishItem from "components/account/wishItem";
 import { ListPlus } from "phosphor-react-native";
 import { useRef } from "react";
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Tabs } from "react-native-collapsible-tab-view";
 import { Swipeable } from "react-native-gesture-handler";
 
 const AccountWishlist = () => {
@@ -33,7 +34,7 @@ const AccountWishlist = () => {
 
   return (
     <View style={[styles.wishlist]}>
-      <FlatList
+      <Tabs.FlatList
         data={data}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
@@ -50,7 +51,8 @@ const AccountWishlist = () => {
         }}
         contentContainerStyle={{
           gap: 14,
-          paddingVertical: 16,
+          paddingTop: 16,
+          paddingBottom: 20,
           paddingHorizontal: 16,
         }}
         keyExtractor={(item, index) => index.toString()}

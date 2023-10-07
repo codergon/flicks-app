@@ -53,8 +53,8 @@ export default ProfileMediaItem;
 
 const styles = StyleSheet.create({
   content: {
-    flex: 1 / 3,
-    margin: 3,
+    // flex: 1 / 3,
+    marginHorizontal: 3,
     height: 180,
     borderRadius: 8,
     overflow: "hidden",
