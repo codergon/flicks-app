@@ -43,8 +43,8 @@ export default function RootLayout() {
 }
 
 export const unstable_settings = {
-  // initialRouteName: "(tabs)",
-  initialRouteName: "upload",
+  initialRouteName: "(tabs)",
+  // initialRouteName: "upload",
 };
 
 function RootLayoutNav() {
@@ -55,13 +55,20 @@ function RootLayoutNav() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Fragment>
           <Stack
-            initialRouteName="upload"
-            // initialRouteName="(tabs)"
+            // initialRouteName="upload"
+            initialRouteName="(tabs)"
             screenOptions={{ headerShown: false }}
           >
             <Stack.Screen name="index" redirect />
             <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="upload" />
+            <Stack.Screen
+              name="upload"
+              options={{
+                gestureDirection: "vertical",
+                animation: "fade_from_bottom",
+                presentation: "fullScreenModal",
+              }}
+            />
           </Stack>
 
           <CreateContentModal />

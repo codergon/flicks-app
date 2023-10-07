@@ -9,7 +9,9 @@ const UploadHeaderBtns = () => {
     <Fragment>
       <TouchableOpacity
         onPress={() => {
-          router.push("/(tabs)/(discover)/home");
+          router.canGoBack()
+            ? router.back()
+            : router.replace("/(tabs)/(home)/home");
         }}
         style={[
           {

@@ -3892,6 +3892,13 @@ expo-image-loader@~4.3.0:
   resolved "https://registry.yarnpkg.com/expo-image-loader/-/expo-image-loader-4.3.0.tgz#d897b4d4f1838faa8291c36f00b99c2b36a6ac5c"
   integrity sha512-2kqJIO+oYM8J3GbvTUHLqTSpt1dLpOn/X0eB4U4RTuzz/faj8l/TyQELsMBLlGAkweNUuG9LqznbaBz+WuSFEw==
 
+expo-image-manipulator@~11.3.0:
+  version "11.3.0"
+  resolved "https://registry.yarnpkg.com/expo-image-manipulator/-/expo-image-manipulator-11.3.0.tgz#3bf5e1d7331c182950f73bfacf2060cc4604170e"
+  integrity sha512-lw17v8VD5LqE+j3YMZNNlfM19OlkBPzLEoVyGcx9FtGC533le5dnXF+UiZTCbFIVr/xyBJTMse9G0oJ70q9MbQ==
+  dependencies:
+    expo-image-loader "~4.3.0"
+
 expo-image-picker@~14.3.2:
   version "14.3.2"
   resolved "https://registry.yarnpkg.com/expo-image-picker/-/expo-image-picker-14.3.2.tgz#5ae2f36fe518a10c8fe82e5ff2ee735c14817cfc"
@@ -3992,6 +3999,11 @@ expo-system-ui@~2.4.0:
   dependencies:
     "@react-native/normalize-color" "^2.0.0"
     debug "^4.3.2"
+
+expo-video-thumbnails@~7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/expo-video-thumbnails/-/expo-video-thumbnails-7.4.0.tgz#da28e47f46a71afcae89c33bb1f2a815b879a014"
+  integrity sha512-5hP1joV4LlBk8E1eD9n2DrFigHSGCybtZTGeKDr6SqHYBCmVWq1MuR5kn3t3Cqlfy4oUqy4emEu/AnBglhBlRQ==
 
 expo-web-browser@~12.3.2:
   version "12.3.2"

@@ -1,30 +1,17 @@
-import { View, Animated, ScrollView, FlatList } from "react-native";
 import Layout from "constants/Layout";
-import { styles } from "./upload.styles";
-import { StatusBar } from "expo-status-bar";
+import { StatusBar } from "react-native";
+import { useApp } from "contexts/AppContext";
+import { useFocusEffect } from "expo-router";
 import { Container } from "components/_ui/custom";
-import { Fragment, useRef, useState } from "react";
 import UploadFooter from "components/upload/footer";
-import ImageView from "components/upload/imageView";
+import { useCallback, useRef, useState } from "react";
+import { View, Animated, FlatList } from "react-native";
 import UploadHeaderBtns from "components/upload/header";
+import MediaItemView from "components/upload/mediaItemView";
 import UploadMediaPreview from "components/upload/mediaPreview";
 
 const Upload = () => {
-  const [media, setMedia] = useState<any>([
-    {
-      id: 1,
-    },
-    {
-      id: 2,
-    },
-    {
-      id: 3,
-    },
-  ]);
-
-  const removeItem = (id: string) => {
-    setMedia((p: any) => p.filter((item: any) => item.id !== id));
-  };
+  const { selectedMedia } = useApp();
 
   const scrollToIndex = (index: number) => {
     flatListRef?.current?.scrollToIndex({ animated: true, index: index });
@@ -43,10 +30,12 @@ const Upload = () => {
     itemVisiblePercentThreshold: 50,
   }).current;
 
-  // Edit media
-  const editMedia = (action: string) => {
-    console.log(action);
-  };
+  useFocusEffect(
+    useCallback(() => {
+      // Change status bar color
+      StatusBar.setBarStyle("light-content");
+    }, [])
+  );
 
   return (
     <Container
@@ -56,8 +45,6 @@ const Upload = () => {
         },
       ]}
     >
-      <StatusBar style="light" />
-
       <View
         style={{
           flex: 1,
@@ -69,7 +56,7 @@ const Upload = () => {
 
         <FlatList
           horizontal
-          data={media}
+          data={selectedMedia}
           pagingEnabled
           ref={flatListRef}
           decelerationRate="fast"
@@ -77,7 +64,7 @@ const Upload = () => {
           ItemSeparatorComponent={() => (
             <View style={{ width: 10, height: "100%" }} />
           )}
-          renderItem={({ item, index }) => <ImageView />}
+          renderItem={({ item, index }) => <MediaItemView media={item} />}
           onScroll={(event) => {
             Animated.event(
               [{ nativeEvent: { contentOffset: { x: scrollX } } }],
@@ -92,14 +79,12 @@ const Upload = () => {
         />
 
         <UploadMediaPreview
-          data={media}
-          removeItem={removeItem}
           currentIndex={currentIndex}
           scrollToIndex={scrollToIndex}
         />
       </View>
 
-      <UploadFooter />
+      <UploadFooter currentMedia={selectedMedia[currentIndex]} />
     </Container>
   );
 };
