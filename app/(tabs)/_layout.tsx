@@ -1,9 +1,11 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import Colors from "constants/Colors";
 import Icons from "components/_common/Icons";
 import useColorScheme from "hooks/useColorScheme";
 import { useModals } from "contexts/ModalsContext";
 import { TouchableOpacity, View } from "react-native";
+import { Text } from "components/_ui/typography";
+import { useAccount } from "contexts/AccountContext";
 
 function TabBarIcon(props: { label: string; color: string }) {
   return (
@@ -37,6 +39,15 @@ export const unstable_settings = {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { openCreateContentModal } = useModals();
+  const { auth, isLoading } = useAccount();
+
+  if (isLoading) {
+    return <Text>Flicks</Text>;
+  }
+
+  if (!auth) {
+    return <Redirect href="/onboarding/" />;
+  }
 
   return (
     <Tabs

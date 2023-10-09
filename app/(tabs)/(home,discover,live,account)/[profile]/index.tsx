@@ -164,7 +164,7 @@ const UserProfile = () => {
       </View>
 
       {/* Tabs */}
-      {!true ? (
+      {true ? (
         <View style={[styles.container]}>
           <TabView
             lazy

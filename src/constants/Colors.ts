@@ -22,7 +22,7 @@ export default {
     invert: "#fff",
 
     text: "#fff",
-    background: "#000",
+    background: "#080808",
     tint: tintColorDark,
 
     tabBorder: "#f2f3f3",

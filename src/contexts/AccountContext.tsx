@@ -1,14 +1,19 @@
 import React from "react";
 import { useStorageState } from "hooks/useStorageState";
 
-const AccountContext = React.createContext<{
+type AccountProviderProps = {
+  children: React.ReactNode;
+};
+
+interface AccountContext {
+  isLoading: boolean;
   signIn: () => void;
   signOut: () => void;
   auth?: string | null;
-  isLoading: boolean;
-} | null>(null);
+}
 
-// This hook can be used to access the user info.
+const AccountContext = React.createContext({} as AccountContext);
+
 export function useAccount() {
   const value = React.useContext(AccountContext);
   if (process.env.NODE_ENV !== "production") {
@@ -16,14 +21,8 @@ export function useAccount() {
       throw new Error("useAccount must be wrapped in a <AccountProvider />");
     }
   }
-
   return value;
 }
-
-// Type definitions for props
-type AccountProviderProps = {
-  children: React.ReactNode;
-};
 
 export default function AccountProvider(props: AccountProviderProps) {
   const [[isLoading, auth], setAuth] = useStorageState("auth");
@@ -37,6 +36,7 @@ export default function AccountProvider(props: AccountProviderProps) {
         signOut: () => {
           setAuth(null);
         },
+
         auth,
         isLoading,
       }}

@@ -15,7 +15,6 @@ export type MediaType = ImagePicker.ImagePickerAsset & {
 
 interface AppContext {
   loading: boolean;
-
   selectedMedia: MediaType[];
   removeMedia: (assetId?: string) => void;
   startContentUpload: () => Promise<void>;

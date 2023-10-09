@@ -100,7 +100,7 @@ const LiveStreamItem = ({ item, showBorder = true }: ContentProps) => {
           }}
         >
           <Text numberOfLines={2} style={[styles.title]}>
-            How To Be A Content Creator based on lorem ipsum dolor sit.
+            How to be a content creator based on true story.
           </Text>
         </View>
       </View>

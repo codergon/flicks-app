@@ -61,6 +61,7 @@ function RootLayoutNav() {
           >
             <Stack.Screen name="index" redirect />
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="onboarding" />
             <Stack.Screen
               name="upload"
               options={{
