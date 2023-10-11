@@ -1,12 +1,11 @@
 import "react-native-gesture-handler";
-
 import dayjs from "dayjs";
-import ModalsProvider from "./ModalsContext";
+import ModalsProvider from "./ModalsProvider";
 import duration from "dayjs/plugin/duration";
-import AppContextProvider from "./AppContext";
-import AccountProvider from "./AccountContext";
+import AppContextProvider from "./AppProvider";
+import AccountProvider from "./AccountProvider";
 import { ReactNode, ReactElement } from "react";
-import SettingsProvider from "./SettingsContext";
+import SettingsProvider from "./SettingsProvider";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 dayjs.extend(duration);

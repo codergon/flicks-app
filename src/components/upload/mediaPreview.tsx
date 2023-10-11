@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { Image } from "expo-image";
 import { Trash2, X } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
-import { useApp } from "contexts/AppContext";
+import { useApp } from "providers/AppProvider";
 
 interface UploadMediaPreviewProps {
   currentIndex?: number;

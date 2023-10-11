@@ -3,9 +3,9 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { Fragment, useEffect } from "react";
 import { useFonts } from "expo-font";
-import { Providers } from "contexts/Providers";
+import { Fragment, useEffect } from "react";
+import { Providers } from "providers/Providers";
 import { SplashScreen, Stack } from "expo-router";
 import useColorScheme from "hooks/useColorScheme";
 import CreateContentModal from "components/modals/create-content";
@@ -44,7 +44,6 @@ export default function RootLayout() {
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
-  // initialRouteName: "upload",
 };
 
 function RootLayoutNav() {
@@ -55,13 +54,12 @@ function RootLayoutNav() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Fragment>
           <Stack
-            // initialRouteName="upload"
             initialRouteName="(tabs)"
-            screenOptions={{ headerShown: false }}
+            screenOptions={{ headerShown: false, animation: "fade" }}
           >
             <Stack.Screen name="index" redirect />
             <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="onboarding" />
+            <Stack.Screen name="onboarding" options={{ animation: "fade" }} />
             <Stack.Screen
               name="upload"
               options={{

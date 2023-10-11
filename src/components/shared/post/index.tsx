@@ -14,7 +14,7 @@ import Creator from "components/shared/creator";
 import { primaryColor } from "constants/Colors";
 import { LightText, RgText, Text } from "components/_ui/typography";
 import { Animated, FlatList, TouchableOpacity, View } from "react-native";
-import { useModals } from "contexts/ModalsContext";
+import { useModals } from "providers/ModalsProvider";
 
 interface PostProps {
   isPaid?: boolean;

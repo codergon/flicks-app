@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { padding } from "helpers/styles";
-import { MediaType } from "contexts/AppContext";
+import { MediaType } from "providers/AppProvider";
 import { Fragment, useRef, useState } from "react";
 import { Animated, FlatList, StyleSheet, View } from "react-native";
 

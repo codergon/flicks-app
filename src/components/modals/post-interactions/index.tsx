@@ -7,7 +7,7 @@ import BottomSheet, {
 import Layout from "constants/Layout";
 import { View, StyleSheet, TouchableOpacity, Keyboard } from "react-native";
 import { primaryColor } from "constants/Colors";
-import { useModals } from "contexts/ModalsContext";
+import { useModals } from "providers/ModalsProvider";
 import { useCallback, useMemo, useState } from "react";
 import { RgText, Text } from "components/_ui/typography";
 import CustomBackground from "components/modals/custombackground";

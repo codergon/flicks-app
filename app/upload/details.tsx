@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { StatusBar } from "react-native";
 import { styles } from "./details.styles";
-import { useApp } from "contexts/AppContext";
+import { useApp } from "providers/AppProvider";
 import { Container } from "components/_ui/custom";
 import React, { useCallback, useState } from "react";
 import { router, useFocusEffect } from "expo-router";

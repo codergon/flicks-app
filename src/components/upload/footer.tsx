@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { padding } from "helpers/styles";
 import Icons from "components/_common/Icons";
-import { MediaType, useApp } from "contexts/AppContext";
+import { MediaType, useApp } from "providers/AppProvider";
 import RotationDividers from "./rotationDividers";
 import { RgText } from "components/_ui/typography";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

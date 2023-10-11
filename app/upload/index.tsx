@@ -1,6 +1,6 @@
 import Layout from "constants/Layout";
 import { StatusBar } from "react-native";
-import { useApp } from "contexts/AppContext";
+import { useApp } from "providers/AppProvider";
 import { useFocusEffect } from "expo-router";
 import { Container } from "components/_ui/custom";
 import UploadFooter from "components/upload/footer";

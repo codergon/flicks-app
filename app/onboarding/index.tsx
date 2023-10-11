@@ -3,16 +3,18 @@ import { Image } from "expo-image";
 import Br from "components/_common/Br";
 import styles from "./onboarding.styles";
 import { Container } from "components/_ui/custom";
+import { useAccount } from "providers/AccountProvider";
 import { RgText, Text } from "components/_ui/typography";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { View, TouchableOpacity, useColorScheme } from "react-native";
 
 const Onboarding = () => {
   const insets = useSafeAreaInsets();
-
   const isDark = useColorScheme() === "dark";
   const invert = isDark ? "#fff" : "#000";
   const description = isDark ? "#ccc" : "#676C75";
+
+  const { authorizationInProgress, connect } = useAccount();
 
   return (
     <Fragment>
@@ -75,6 +77,8 @@ const Onboarding = () => {
           </View>
 
           <TouchableOpacity
+            onPress={connect}
+            disabled={authorizationInProgress}
             style={[
               styles.continueBtn,
               {

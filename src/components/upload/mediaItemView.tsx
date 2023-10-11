@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { padding } from "helpers/styles";
 import { ResizeMode, Video } from "expo-av";
 import { Play } from "phosphor-react-native";
-import { MediaType } from "contexts/AppContext";
+import { MediaType } from "providers/AppProvider";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface MediaItemViewProps {

@@ -4,9 +4,9 @@ import BottomSheet, {
   BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
 import { padding } from "helpers/styles";
-import { useApp } from "contexts/AppContext";
+import { useApp } from "providers/AppProvider";
 import { CalendarPlus } from "lucide-react-native";
-import { useModals } from "contexts/ModalsContext";
+import { useModals } from "providers/ModalsProvider";
 import { Fragment, useCallback, useMemo } from "react";
 import { RgText, Text } from "components/_ui/typography";
 import { Broadcast, UploadSimple } from "phosphor-react-native";

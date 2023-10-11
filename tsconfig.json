@@ -12,7 +12,7 @@
       "typings/*": ["src/types/*"],
       "helpers/*": ["src/helpers/*"],
       "layouts/*": ["src/layouts/*"],
-      "contexts/*": ["src/contexts/*"],
+      "providers/*": ["src/providers/*"],
       "constants/*": ["src/constants/*"],
       "components/*": ["src/components/*"]
     }

@@ -1,11 +1,11 @@
-import { Redirect, Tabs } from "expo-router";
 import Colors from "constants/Colors";
+import { Redirect, Tabs } from "expo-router";
 import Icons from "components/_common/Icons";
-import useColorScheme from "hooks/useColorScheme";
-import { useModals } from "contexts/ModalsContext";
-import { TouchableOpacity, View } from "react-native";
 import { Text } from "components/_ui/typography";
-import { useAccount } from "contexts/AccountContext";
+import useColorScheme from "hooks/useColorScheme";
+import { useModals } from "providers/ModalsProvider";
+import { TouchableOpacity, View } from "react-native";
+import { useAccount } from "providers/AccountProvider";
 
 function TabBarIcon(props: { label: string; color: string }) {
   return (
@@ -39,13 +39,13 @@ export const unstable_settings = {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { openCreateContentModal } = useModals();
-  const { auth, isLoading } = useAccount();
+  const { connectedAccount, isAuthenticating } = useAccount();
 
-  if (isLoading) {
+  if (isAuthenticating) {
     return <Text>Flicks</Text>;
   }
 
-  if (!auth) {
+  if (!connectedAccount) {
     return <Redirect href="/onboarding/" />;
   }
 
