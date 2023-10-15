@@ -1,10 +1,15 @@
 import { Image } from "expo-image";
 import { padding } from "helpers/styles";
+import { IPostComment } from "typings/post";
+import TimeAgo from "components/_common/TimeAgo";
 import { RgText, Text } from "components/_ui/typography";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { View, StyleSheet, TouchableHighlight } from "react-native";
 
-const PostComment = () => {
+interface PostCommentProps {
+  comment: IPostComment;
+}
+
+const PostComment = ({ comment }: PostCommentProps) => {
   return (
     <View style={[styles.comment]}>
       <TouchableHighlight
@@ -19,7 +24,7 @@ const PostComment = () => {
           transition={300}
           contentFit="cover"
           style={[styles.comment_userImage_img]}
-          source={require("assets/images/mock/5.png")}
+          source={{ uri: comment?.author?.image_url }}
         />
       </TouchableHighlight>
 
@@ -47,18 +52,18 @@ const PostComment = () => {
               },
             ]}
           >
-            Rissa
+            {comment?.author?.moniker}
           </Text>
-          <RgText
-            style={[
-              {
-                fontSize: 12.4,
-                color: "#666",
-              },
-            ]}
-          >
-            2hrs ago
-          </RgText>
+          {comment?.created_at && (
+            <TimeAgo
+              date={Date.parse(comment?.created_at)}
+              textStyle={{
+                fontSize: 11,
+                lineHeight: 11,
+                color: "#676C75",
+              }}
+            />
+          )}
         </View>
 
         <RgText
@@ -69,7 +74,7 @@ const PostComment = () => {
             },
           ]}
         >
-          This art feels like a dream. I love it 👏
+          {comment?.message}
         </RgText>
       </View>
     </View>

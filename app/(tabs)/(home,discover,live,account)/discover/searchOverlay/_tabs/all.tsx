@@ -1,15 +1,16 @@
 import Post from "components/shared/post";
-import { FlatList, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Tabs } from "react-native-collapsible-tab-view";
 
 const AllResults = () => {
   return (
     <View style={[styles.creators_results]}>
-      <FlatList
+      <Tabs.FlatList
         data={[1, 2, 3, 4, 5, 6]}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => {
-          return <Post isPaid={!true} containsMedia={item % 3 == 0} />;
+          return <Post post={{}} />;
         }}
         contentContainerStyle={{ paddingBottom: 16 }}
         keyExtractor={(item, index) => index.toString()}

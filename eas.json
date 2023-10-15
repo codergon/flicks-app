@@ -4,13 +4,16 @@
   },
   "build": {
     "development": {
+      "node": "20.8.0",
       "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "node": "20.8.0"
+    }
   },
   "submit": {
     "production": {}

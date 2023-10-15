@@ -1,10 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useStorageState } from "hooks/useStorageState";
-
-import { alertAndLog } from "utils/alertAndLog";
-import nacl from "tweetnacl";
 import bs58 from "bs58";
+import axios from "axios";
+import nacl from "tweetnacl";
+import { Creator } from "typings/user";
 import * as Linking from "expo-linking";
+import Toast from "react-native-toast-message";
+import { router, useSegments } from "expo-router";
+import { useStorageState } from "hooks/useStorageState";
+import React, { useCallback, useEffect, useState } from "react";
+import { useLargeStorageState } from "hooks/useLargeStorageState";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   clusterApiUrl,
   Connection,
@@ -19,23 +23,24 @@ import {
   decryptPayload,
   encryptPayload,
 } from "utils/phantom";
-import { router, useSegments } from "expo-router";
 
 const NETWORK = clusterApiUrl("mainnet-beta");
 
 const onConnectRedirectLink = createAppLink("onConnect");
 const onDisconnectRedirectLink = createAppLink("onDisconnect");
+const onSignMessageRedirectLink = createAppLink("onSignMessage");
+const onSignTransactionRedirectLink = createAppLink("onSignTransaction");
 const onSignAndSendTransactionRedirectLink = createAppLink(
   "onSignAndSendTransaction"
 );
 const onSignAllTransactionsRedirectLink = createAppLink(
   "onSignAllTransactions"
 );
-const onSignTransactionRedirectLink = createAppLink("onSignTransaction");
-const onSignMessageRedirectLink = createAppLink("onSignMessage");
 
 export default function AccountProvider(props: AccountProviderProps) {
   const segments = useSegments();
+  const insets = useSafeAreaInsets();
+  const handleDeepLink = ({ url }: Linking.EventType) => setDeepLink(url);
 
   const [deepLink, setDeepLink] = useState<string>("");
   const [logs, setLogs] = useState<string[]>([]);
@@ -45,23 +50,35 @@ export default function AccountProvider(props: AccountProviderProps) {
     []
   );
 
-  // store dappKeyPair, sharedSecret, session and account SECURELY on device
-  // to avoid having to reconnect users.
+  // store dappKeyPair, sharedSecret, session and account SECURELY
+  // on device to avoid having to reconnect users.
   const [dappKeyPair] = useState(nacl.box.keyPair());
-  const [sharedSecret, setSharedSecret] = useState<Uint8Array>();
   const [session, setSession] = useState<string>();
+  const [sharedSecret, setSharedSecret] = useState<Uint8Array>();
 
-  // const [connectedAccount, setConnectedAccount] = useState<PublicKey>();
+  // create user
+  const [bio, setBio] = useState("");
+  const [username, setUsername] = useState("");
+  const [useDomainName, setUseDomainName] = useState(true);
 
-  const [[isLoading, connectedAccount], setConnectedAccount] =
-    useStorageState("connectedAccount");
+  // user data
+  const [isFetchingUser, setIsFetchingUser] = useState<boolean>(false);
+  const [phantomWalletPublicKey, setPhantomWalletPublicKey] =
+    useState<PublicKey>();
+  const [[isLoading, userData], setuserData] =
+    useLargeStorageState<Creator>("userData");
+  const [[isLoadingSig, userSignature], setUserSignature] =
+    useStorageState<SignedMessage>("userSignature");
 
+  // connect acct
+  const [acctSNS, setAcctSNS] = useState<string>("");
+  const [isFetchingSNS, setIsFetchingSNS] = useState<boolean>(false);
+  const [isCheckingUser, setIsCheckingUser] = useState<boolean>(false);
+  const [user, setUser] = useState<PrepareUserParams | null>(null);
+  const [isCreatingAccount, setIsCreatingAccount] = useState<boolean>(false);
   const [authorizationInProgress, setAuthorizationInProgress] = useState(false);
 
-  const handleDeepLink = ({ url }: Linking.EventType) => setDeepLink(url);
-
-  // setConnectedAccount();
-
+  // set deep link
   useEffect(() => {
     (async () => {
       const initialUrl = await Linking.getInitialURL();
@@ -73,11 +90,127 @@ export default function AccountProvider(props: AccountProviderProps) {
     return () => {};
   }, []);
 
-  useEffect(() => {
-    if (connectedAccount && segments[0] === "onboarding") {
-      router.replace("/(tabs)/(home)/home");
+  const fetchSNS = async (
+    publicKey: PublicKey,
+    connectData = {
+      session,
+      sharedSecret,
     }
-  }, [connectedAccount]);
+  ) => {
+    setIsFetchingSNS(true);
+    try {
+      const { data } = await axios.get(
+        `https://flicks.hop.sh/domain/${publicKey?.toString()}`
+      );
+      setAcctSNS(data?.domainName);
+    } catch (e) {
+    } finally {
+      setIsFetchingSNS(false);
+      signMessage(connectData);
+    }
+  };
+
+  // sign message
+  const signMessage = async (
+    connectData = {
+      session,
+      sharedSecret,
+    }
+  ) => {
+    const message =
+      "Message: Welcome to Flicks!\nURI: https://flicks.vercel.app";
+
+    const payload = {
+      session: connectData.session,
+      message: bs58.encode(Buffer.from(message)),
+    };
+
+    const [nonce, encryptedPayload] = encryptPayload(
+      payload,
+      connectData.sharedSecret
+    );
+
+    const params = new URLSearchParams({
+      dapp_encryption_public_key: bs58.encode(dappKeyPair.publicKey),
+      nonce: bs58.encode(nonce),
+      redirect_link: onSignMessageRedirectLink,
+      payload: bs58.encode(encryptedPayload),
+    });
+
+    addLog("Signing message...");
+    const url = buildUrl("signMessage", params);
+    Linking.openURL(url);
+
+    setIsCheckingUser(true);
+  };
+
+  // fetch user data
+  const fetchUserData = async (isRefetch = false) => {
+    if (!userSignature || isCheckingUser) return;
+
+    if (!isRefetch) setIsFetchingUser(true);
+    try {
+      const { data } = await axios.get(
+        `/creators/${userSignature?.publicKey}`,
+        {
+          headers: {
+            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          },
+        }
+      );
+
+      if (data?.data) {
+        setuserData(data?.data);
+      } else {
+        // setUserSignature(null);
+      }
+    } catch (error: any) {
+      console.log(error?.response?.data);
+    } finally {
+      if (!isRefetch) setIsFetchingUser(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [userSignature]);
+
+  // create account
+  const createAccount = async (userData = user) => {
+    try {
+      const { status } = await axios.post("/creators/", userData);
+      if (status === 201) fetchUserData();
+    } catch (error: any) {
+      console.log("error: ", error?.response?.data);
+
+      Toast.show({
+        type: "error",
+        text1: "Error creating account",
+        text2: "There was an error creating your account. Please try again",
+        topOffset: insets.top + 10,
+      });
+    } finally {
+      setIsCreatingAccount(false);
+    }
+  };
+
+  // check if user exist
+  const checkUser = async (signedUser = userSignature) => {
+    if (!signedUser) return;
+    try {
+      const { data } = await axios.get(`/creators/${signedUser?.publicKey}`, {
+        headers: {
+          Authorization: `Signature ${signedUser?.publicKey}:${signedUser?.signature}`,
+        },
+      });
+
+      if (data?.data) setuserData(data);
+    } catch (e) {
+      router.replace("/(onboarding)/setup");
+    } finally {
+      setIsCheckingUser(false);
+    }
+  };
 
   // handle inbounds links
   useEffect(() => {
@@ -106,15 +239,52 @@ export default function AccountProvider(props: AccountProviderProps) {
       setSharedSecret(sharedSecretDapp);
       setSession(connectData.session);
 
-      const acct = new PublicKey(connectData.public_key).toString();
-      if (acct) setConnectedAccount(acct);
-
-      // alertAndLog("Connected", JSON.stringify(connectData, null, 2));
+      const public_key = new PublicKey(connectData.public_key);
+      if (public_key) {
+        setPhantomWalletPublicKey(public_key);
+        fetchSNS(public_key, {
+          session: connectData.session,
+          sharedSecret: sharedSecretDapp,
+        });
+      }
 
       addLog(JSON.stringify(connectData, null, 2));
+    } else if (/onSignMessage/.test(url.host)) {
+      const signMessageData = decryptPayload(
+        params.get("data")!,
+        params.get("nonce")!,
+        sharedSecret
+      );
+
+      setUserSignature(signMessageData);
+      setAuthorizationInProgress(false);
+
+      checkUser(signMessageData);
+
+      addLog(JSON.stringify(signMessageData, null, 2));
     }
   }, [deepLink]);
 
+  // prepare user data
+  const prepareUser = async (data: PrepareUserParams) => {
+    const { image_url, banner_url, bio, moniker } = data;
+    const user = {
+      bio,
+      moniker,
+      image_url,
+      banner_url:
+        banner_url || "https://ik.imagekit.io/alphaknight/18_R3g07OvuJ.png",
+      address: phantomWalletPublicKey?.toString(),
+    };
+
+    if (!user?.address) return;
+
+    setIsCreatingAccount(true);
+    setUser(user);
+    createAccount(user);
+  };
+
+  // connect wallet to app and get account
   const connect = useCallback(async () => {
     try {
       if (authorizationInProgress) {
@@ -131,15 +301,18 @@ export default function AccountProvider(props: AccountProviderProps) {
 
       Linking.openURL(url);
     } catch (err: any) {
-      alertAndLog(
-        "Error during connect",
-        err instanceof Error ? err.message : err
-      );
+      Toast.show({
+        type: "error",
+        text1: "Error connecting wallet",
+        text2: "There was an error connecting your wallet. Please try again",
+        topOffset: insets.top + 10,
+      });
     } finally {
       setAuthorizationInProgress(false);
     }
   }, [authorizationInProgress]);
 
+  // disconnect wallet from app
   const disconnect = async () => {
     const payload = {
       session,
@@ -160,11 +333,29 @@ export default function AccountProvider(props: AccountProviderProps) {
   return (
     <AccountContext.Provider
       value={{
+        acctSNS,
         connect,
         disconnect,
-        connectedAccount,
+        isFetchingSNS,
+        isCheckingUser,
+        phantomWalletPublicKey,
         authorizationInProgress,
-        isAuthenticating: isLoading,
+        isAuthenticating: isLoading || isLoadingSig || isFetchingUser,
+
+        prepareUser,
+        isCreatingAccount,
+
+        fetchUserData,
+
+        bio,
+        setBio,
+        username,
+        setUsername,
+        useDomainName,
+        setUseDomainName,
+
+        userData,
+        userSignature,
       }}
     >
       {props.children}
@@ -172,13 +363,43 @@ export default function AccountProvider(props: AccountProviderProps) {
   );
 }
 
+interface SignedMessage {
+  publicKey: string;
+  signature: string;
+}
+
+interface PrepareUserParams {
+  bio: string;
+  moniker: string;
+  address?: string;
+  image_url: string;
+  banner_url?: string;
+}
+
 interface AccountContext {
+  bio: string;
+  username: string;
+  useDomainName: boolean;
+  setBio: (bio: string) => void;
+  setUsername: (username: string) => void;
+  setUseDomainName: (useDomainName: boolean) => void;
+
+  fetchUserData: (isRefetch?: boolean) => Promise<void>;
+
+  acctSNS: string;
+  isFetchingSNS: boolean;
+  isCheckingUser: boolean;
   isAuthenticating: boolean;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   authorizationInProgress: boolean;
-  // connectedAccount?: PublicKey;
-  connectedAccount?: string | null;
+
+  userData: Creator | null;
+  userSignature: SignedMessage | null;
+  phantomWalletPublicKey?: PublicKey;
+
+  isCreatingAccount: boolean;
+  prepareUser: (data: PrepareUserParams) => Promise<void>;
 }
 
 type AccountProviderProps = {

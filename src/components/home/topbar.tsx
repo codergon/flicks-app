@@ -1,8 +1,7 @@
 import { StyleSheet, View } from "react-native";
-import React from "react";
 import { Text } from "components/_ui/typography";
-import { Bell, QrCode } from "phosphor-react-native";
 import { ChevronDown } from "lucide-react-native";
+import { Bell, QrCode } from "phosphor-react-native";
 
 const Topbar = () => {
   return (

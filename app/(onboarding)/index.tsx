@@ -6,7 +6,12 @@ import { Container } from "components/_ui/custom";
 import { useAccount } from "providers/AccountProvider";
 import { RgText, Text } from "components/_ui/typography";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, TouchableOpacity, useColorScheme } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  useColorScheme,
+  ActivityIndicator,
+} from "react-native";
 
 const Onboarding = () => {
   const insets = useSafeAreaInsets();
@@ -14,7 +19,8 @@ const Onboarding = () => {
   const invert = isDark ? "#fff" : "#000";
   const description = isDark ? "#ccc" : "#676C75";
 
-  const { authorizationInProgress, connect } = useAccount();
+  const { authorizationInProgress, connect, isCheckingUser, isFetchingSNS } =
+    useAccount();
 
   return (
     <Fragment>
@@ -78,7 +84,7 @@ const Onboarding = () => {
 
           <TouchableOpacity
             onPress={connect}
-            disabled={authorizationInProgress}
+            disabled={authorizationInProgress || isFetchingSNS}
             style={[
               styles.continueBtn,
               {
@@ -93,8 +99,25 @@ const Onboarding = () => {
                 fontSize: 16,
               }}
             >
-              Connect Wallet
+              {isFetchingSNS
+                ? "Fetching SNS..."
+                : isCheckingUser
+                ? "Authenticating account"
+                : authorizationInProgress
+                ? "Connecting Wallet"
+                : "Connect Wallet"}
             </Text>
+
+            {(isFetchingSNS || isCheckingUser || authorizationInProgress) && (
+              <ActivityIndicator
+                size={"small"}
+                style={{
+                  right: 16,
+                  position: "absolute",
+                }}
+                color={isDark ? "#000" : "#fff"}
+              />
+            )}
           </TouchableOpacity>
         </View>
       </Container>

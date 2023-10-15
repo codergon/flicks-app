@@ -1,54 +1,45 @@
 import { Image } from "expo-image";
 import styles from "./post.styles";
+import { IPostMedia } from "typings/post";
 import { ResizeMode, Video } from "expo-av";
 import { Play } from "phosphor-react-native";
+import { Blurhash } from "react-native-blurhash";
 import { RgText } from "components/_ui/typography";
 import { Fragment, useRef, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 interface PostMediaProps {
-  item: any;
   index: number;
+  media: IPostMedia;
 }
 
-const PostMedia = ({ item, index }: PostMediaProps) => {
-  const showVideo = index === 1;
+const PostMedia = ({ media, index }: PostMediaProps) => {
   const video = useRef<Video>(null);
   const [status, setStatus] = useState<any>({});
 
   return (
-    <View
-      style={[
-        styles.post_mediaItem,
-        {
-          borderRightColor: "#ddd",
-          borderRightWidth: !true ? 1 : 0,
-        },
-      ]}
-    >
-      {!showVideo ? (
+    <View style={[styles.post_mediaItem]}>
+      {media?.media_type === "image" ? (
         <Image
-          style={[styles.mediaImage]}
-          source={require("assets/images/mock/1.png")}
-          placeholder={
-            "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj["
-          }
-          contentFit="cover"
           transition={300}
+          contentFit="cover"
+          style={[styles.mediaImage]}
+          source={{ uri: media?.url }}
+          placeholder={media?.blur_hash || "LIG+2d-;yDv{P;s+MvVrv0WF+FOt"}
         />
       ) : (
         <Video
+          isLooping
           ref={video}
           style={styles.mediaVideo}
-          source={require("assets/videos/1.mp4")}
           useNativeControls={false}
+          source={{ uri: media?.url }}
           resizeMode={ResizeMode.COVER}
-          isLooping
           onPlaybackStatusUpdate={(status) => setStatus(() => status)}
         />
       )}
 
-      {video?.current && showVideo && (
+      {media?.media_type === "video" && video?.current && (
         <TouchableOpacity
           style={[styles.videoOverlay]}
           onPress={() =>

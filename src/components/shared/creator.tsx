@@ -11,14 +11,14 @@ interface CreatorProps {
 }
 
 const Creator = ({ item, size, badge }: CreatorProps) => {
-  const [_, segment] = useSegments();
+  const [, segment] = useSegments();
 
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       style={[styles.creator]}
       onPress={() => {
-        router.push(`/${segment}/2345`);
+        // router.push(`/${segment}/2345`);
       }}
     >
       <View
@@ -42,13 +42,13 @@ const Creator = ({ item, size, badge }: CreatorProps) => {
           </View>
         )}
         <Image
-          style={[styles.creatorAvatar_image]}
-          source={require("assets/images/mock/1.png")}
-          placeholder={
-            "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj["
-          }
+          transition={100}
           contentFit="cover"
-          transition={300}
+          style={[styles.creatorAvatar_image]}
+          placeholder={"LKN]Rv%2Tw=w]~RBVZRi};RPxuwH"}
+          source={{
+            uri: "https://www.cosmos.so/wp-content/uploads/2023/05/vortex80.jpg",
+          }}
         />
       </View>
       <View style={[styles.creatorInfo]}>

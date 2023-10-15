@@ -14,6 +14,7 @@ module.exports = function (api) {
             assets: "./assets",
             utils: "./src/utils",
             hooks: "./src/hooks",
+            config: "./src/config",
             typings: "./src/types",
             layouts: "./src/layouts",
             helpers: "./src/helpers",

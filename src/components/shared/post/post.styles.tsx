@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
 
   post_mediaItem: {
     aspectRatio: 1,
+    position: "relative",
     width: Layout.window.width,
     backgroundColor: "#f1f1f1",
   },
@@ -159,12 +160,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
     flexDirection: "row",
-    ...padding(9, 16, 13),
+    ...padding(9, 16, 13, 8),
     justifyContent: "center",
   },
   // Post stats
   post_stats: {
-    gap: 10,
+    gap: 6,
     flex: 1,
     flexDirection: "row",
     alignItems: "center",

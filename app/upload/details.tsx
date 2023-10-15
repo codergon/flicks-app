@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { StatusBar } from "react-native";
+import { ActivityIndicator, StatusBar } from "react-native";
 import { styles } from "./details.styles";
 import { useApp } from "providers/AppProvider";
 import { Container } from "components/_ui/custom";
@@ -20,9 +20,10 @@ const UploadDetails = () => {
     }, [])
   );
 
-  const { selectedMedia } = useApp();
+  const { selectedMedia, uploading, uploadContent } = useApp();
 
   const [price, setPrice] = useState("");
+  const [caption, setCaption] = useState("");
   const [isPaid, setIsPaid] = useState(true);
 
   return (
@@ -119,7 +120,23 @@ const UploadDetails = () => {
         </View>
 
         <View style={[styles.postCaption]}>
+          {/* <View style={[styles.postSettings__item]}>
+            <View style={[styles.postSettings__item_details]}>
+              <Text
+                style={[
+                  {
+                    fontSize: 16,
+                    color: "#fff",
+                  },
+                ]}
+              >
+                Enter a caption
+              </Text>
+            </View>
+          </View> */}
+
           <InputRg
+            value={caption}
             numberOfLines={5}
             multiline
             keyboardType="twitter"
@@ -134,6 +151,7 @@ const UploadDetails = () => {
             ]}
             placeholderTextColor={"#999"}
             placeholder="Add a caption..."
+            onChangeText={(text) => setCaption(text)}
           />
         </View>
 
@@ -210,12 +228,25 @@ const UploadDetails = () => {
       </KeyboardAwareScrollView>
 
       <TouchableOpacity
+        disabled={
+          !caption ||
+          uploading ||
+          (isPaid && (!price || isNaN(Number(price)) || Number(price) < 1))
+        }
+        onPress={() =>
+          uploadContent(
+            caption,
+            isPaid ? "paid" : "free",
+            isPaid ? Number(price) : 0
+          )
+        }
         style={[
           styles.submitBtn,
           {
             opacity:
-              isPaid && (!price || isNaN(Number(price)) || Number(price) < 1)
-                ? 0.7
+              !caption ||
+              (isPaid && (!price || isNaN(Number(price)) || Number(price) < 1))
+                ? 0.8
                 : 1,
             backgroundColor: "#fff",
           },
@@ -227,8 +258,19 @@ const UploadDetails = () => {
             color: "#000",
           }}
         >
-          Upload Post
+          {uploading ? "Uploading Post" : "Upload Post"}
         </Text>
+
+        {uploading && (
+          <ActivityIndicator
+            size={"small"}
+            style={{
+              right: 16,
+              position: "absolute",
+            }}
+            color={"#000"}
+          />
+        )}
       </TouchableOpacity>
     </Container>
   );

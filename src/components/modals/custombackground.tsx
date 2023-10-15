@@ -5,16 +5,16 @@ import Animated, {
 import React, { useMemo } from "react";
 import { BottomSheetBackgroundProps } from "@gorhom/bottom-sheet";
 
-const CustomBackground: React.FC<BottomSheetBackgroundProps> = ({
-  style,
-  animatedIndex,
-}) => {
+const CustomBackground: React.FC<
+  BottomSheetBackgroundProps & {
+    borderRadius?: number;
+  }
+> = ({ style, borderRadius = 16, animatedIndex }) => {
   const containerAnimatedStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
       animatedIndex.value,
       [0, 1],
-      ["#ffffff", "#fff"]
-      // ["#ffffff", "#a8b5eb"]
+      ["#ffffff", "#ffffff"]
     ),
   }));
   const containerStyle = useMemo(
@@ -28,7 +28,8 @@ const CustomBackground: React.FC<BottomSheetBackgroundProps> = ({
       style={[
         containerStyle,
         {
-          borderRadius: 16,
+          borderTopLeftRadius: borderRadius,
+          borderTopRightRadius: borderRadius,
         },
       ]}
     />

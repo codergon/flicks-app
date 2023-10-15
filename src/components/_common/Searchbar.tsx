@@ -4,6 +4,7 @@ import { InputRg } from "../_ui/typography";
 import { View, StyleSheet } from "react-native";
 import useColorScheme from "hooks/useColorScheme";
 import { MagnifyingGlass, X } from "phosphor-react-native";
+import { useApp } from "providers/AppProvider";
 
 type SearchbarProps = {
   value: string;
@@ -25,6 +26,8 @@ const Searchbar = ({
   const iconColor = isDark ? "#ddd" : "#666";
   const textColor = isDark ? "#fff" : "#000";
   const darken = isDark ? "#282828" : "#f2f2f2";
+
+  const { handleSearch, setSearchQuery } = useApp();
 
   return (
     <View
@@ -48,15 +51,25 @@ const Searchbar = ({
         value={value}
         onFocus={onFocus}
         color={textColor}
+        returnKeyType="search"
+        returnKeyLabel="Search"
         onChangeText={onChangeText}
         style={styles.searchbar__input}
-        placeholder={placeholder ?? "Search for something..."}
         placeholderTextColor={iconColor}
+        onSubmitEditing={() => handleSearch(value)}
+        placeholder={placeholder ?? "Search for something..."}
       />
 
       {value && (
         <Pressable
-          onPress={(_) => onChangeText("")}
+          onPress={(_) => {
+            onChangeText("");
+            setSearchQuery({
+              data: null,
+              loading: false,
+              error: null,
+            });
+          }}
           style={{
             ...styles.close__icon__cover,
             backgroundColor: isDark ? "#555" : "#d8d8d8",

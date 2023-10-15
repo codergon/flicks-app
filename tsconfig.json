@@ -9,6 +9,7 @@
       "assets": ["assets/*"],
       "utils/*": ["src/utils/*"],
       "hooks/*": ["src/hooks/*"],
+      "config/*": ["src/config/*"],
       "typings/*": ["src/types/*"],
       "helpers/*": ["src/helpers/*"],
       "layouts/*": ["src/layouts/*"],

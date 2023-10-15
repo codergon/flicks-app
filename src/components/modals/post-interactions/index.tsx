@@ -1,40 +1,43 @@
 import BottomSheet, {
-  BottomSheetFooter,
   BottomSheetBackdrop,
   BottomSheetTextInput,
   BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
 import Layout from "constants/Layout";
-import { View, StyleSheet, TouchableOpacity, Keyboard } from "react-native";
+import {
+  View,
+  Keyboard,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { useMemo, useState } from "react";
 import { primaryColor } from "constants/Colors";
 import { useModals } from "providers/ModalsProvider";
-import { useCallback, useMemo, useState } from "react";
-import { RgText, Text } from "components/_ui/typography";
 import CustomBackground from "components/modals/custombackground";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { SceneMap, TabBar, TabView } from "react-native-tab-view";
-
-import TipsTab from "./tabs/tips";
-import LikesTab from "./tabs/likes";
-import CommentsTab from "./tabs/comments";
 import Animated, {
   interpolate,
-  useAnimatedStyle,
   useSharedValue,
+  useAnimatedStyle,
 } from "react-native-reanimated";
-import { PaperPlane } from "phosphor-react-native";
 
-const renderScene = SceneMap({
-  comments: CommentsTab,
-  likes: LikesTab,
-  tips: TipsTab,
-});
+import TipsTab from "./tabs/tips";
+import CommentsTab from "./tabs/comments";
+import { PaperPlane } from "phosphor-react-native";
+import { Tabs, MaterialTabBar } from "react-native-collapsible-tab-view";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const PostInteractionsModal = () => {
   const insets = useSafeAreaInsets();
   const fullHeight = Layout.window.height - insets.top;
 
-  const { postInteractionsRef } = useModals();
+  const {
+    addComment,
+    isCommenting,
+    postInteractionsRef,
+    onClosePostIntractionsModal,
+  } = useModals();
 
   // Tabview config
   const tabLabelWidth = 76;
@@ -46,43 +49,16 @@ const PostInteractionsModal = () => {
     { key: "tips", title: "Tips" },
   ]);
 
+  const [comment, setComment] = useState("");
+
   // Bottomsheet config
   const [showInput, setShowInput] = useState(true);
-  const snapPoints = useMemo(() => [0.7 * fullHeight, fullHeight], []);
-  const renderFooter = useCallback(
-    (props: any) => (
-      <BottomSheetFooter
-        {...props}
-        bottomInset={insets.bottom}
-        style={{
-          borderColor: "#e8e8e8",
-          backgroundColor: "#fff",
-          borderTopWidth: index === 0 ? 1 : 0,
-        }}
-      >
-        {(index === 0 || showInput) && (
-          <View style={[styles.commentInput, { borderColor: "#ddd" }]}>
-            <BottomSheetTextInput
-              keyboardType="twitter"
-              placeholder="Add a comment…"
-              placeholderTextColor={"#888"}
-              style={[styles.input, { color: "#000" }]}
-            />
-            <TouchableOpacity
-              style={[
-                styles.addCommentBtn,
-                {
-                  backgroundColor: "#eee",
-                },
-              ]}
-            >
-              <PaperPlane size={18} weight="fill" color={primaryColor} />
-            </TouchableOpacity>
-          </View>
-        )}
-      </BottomSheetFooter>
-    ),
-    [index]
+  const snapPoints = useMemo(
+    () => [
+      0.7 * fullHeight,
+      //  fullHeight
+    ],
+    []
   );
 
   // animated index
@@ -101,15 +77,19 @@ const PostInteractionsModal = () => {
   return (
     <BottomSheet
       index={-1}
-      enableOverDrag={false}
       enablePanDownToClose
+      enableOverDrag={false}
       snapPoints={snapPoints}
       ref={postInteractionsRef}
       keyboardBehavior="extend"
       enableDynamicSizing={false}
       animatedIndex={animatedIndex}
       keyboardBlurBehavior="restore"
-      footerComponent={renderFooter}
+      onClose={() => {
+        setComment("");
+        Keyboard.dismiss();
+        onClosePostIntractionsModal();
+      }}
       handleStyle={{ paddingBottom: 20 }}
       handleIndicatorStyle={{
         backgroundColor: "rgba(0,0,0,0.2)",
@@ -127,93 +107,131 @@ const PostInteractionsModal = () => {
     >
       <Animated.View
         onTouchStart={() => Keyboard.dismiss()}
-        style={[
-          styles.container,
-          {
-            // paddingBottom: insets.bottom,
-          },
-          contentAnimatedStyle,
-        ]}
+        style={[styles.container, contentAnimatedStyle]}
       >
-        <TabView
+        <Tabs.Container
           lazy
-          style={{ width: "100%" }}
-          swipeEnabled={false}
-          onIndexChange={setIndex}
-          renderScene={renderScene}
-          navigationState={{ index, routes }}
-          initialLayout={{ width: Layout.window.width }}
-          sceneContainerStyle={{
-            borderWidth: 0,
-            borderTopWidth: 1,
-            borderColor: "#ececec",
+          tabBarHeight={70}
+          snapThreshold={0.5}
+          // @ts-ignore
+          headerContainerStyle={{
+            shadowRadius: 0,
+            shadowOffset: {
+              height: 0,
+            },
           }}
-          renderLazyPlaceholder={({ route }) => {
-            return (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <RgText>Loading {route.title}…</RgText>
-              </View>
-            );
+          onIndexChange={(index) => {
+            setIndex(index);
+            setShowInput(index === 0);
           }}
           renderTabBar={(props) => (
-            <TabBar
+            <MaterialTabBar
               {...props}
+              scrollEnabled
+              inactiveColor="#777"
               indicatorStyle={{
                 height: 2,
                 backgroundColor: primaryColor,
               }}
-              gap={
-                (tabBarWidth - routes.length * tabLabelWidth) /
-                (routes.length - 1)
-              }
               tabStyle={{
-                minHeight: 0,
                 width: "auto",
-                height: "auto",
-                paddingVertical: 0,
                 paddingTop: 6,
-                paddingBottom: 12,
-                paddingHorizontal: 0,
+                height: "auto",
+                marginBottom: 0,
+                paddingBottom: 10,
+                marginVertical: 0,
+                paddingHorizontal: 10,
+              }}
+              labelStyle={{
+                fontSize: 14,
+                textTransform: "capitalize",
+                fontFamily: "AcidGrotesk-Medium",
+              }}
+              contentContainerStyle={{
+                gap: 16,
+                paddingVertical: 0,
+                paddingHorizontal: 20,
               }}
               style={{
                 height: "auto",
-                width: tabBarWidth,
-                alignSelf: "center",
-                marginHorizontal: 20,
-                borderBottomWidth: 0,
+                paddingVertical: 0,
+                borderBottomWidth: 1,
                 backgroundColor: "#fff",
                 borderBottomColor: "#ececec",
               }}
-              onTabPress={({ route, preventDefault }) => {
-                preventDefault(); // intercept navigation
-                setShowInput(route.key === "comments");
-                setIndex(
-                  route.key === "likes" ? 1 : route.key === "tips" ? 2 : 0
-                );
-              }}
-              renderLabel={({ route, focused, color }) => (
-                <Text
-                  style={{
-                    fontSize: 14,
-                    textAlign: "center",
-                    width: tabLabelWidth,
-                    color: focused ? "#000" : "#888",
-                  }}
-                >
-                  {route.title}
-                </Text>
-              )}
             />
           )}
-        />
+        >
+          <Tabs.Tab name="Comments">
+            <CommentsTab />
+          </Tabs.Tab>
+          <Tabs.Tab name="Tips">
+            <TipsTab />
+          </Tabs.Tab>
+        </Tabs.Container>
 
-        <View />
+        <KeyboardAwareScrollView
+          style={{
+            left: 0,
+            bottom: 0,
+            overflow: "visible",
+            position: "absolute",
+            borderColor: "#e8e8e8",
+            backgroundColor: "#fff",
+            width: Layout.window.width,
+            // paddingBottom: index === 0 ? insets.bottom : 0,
+          }}
+        >
+          <View
+            style={{
+              borderColor: "#e8e8e8",
+              backgroundColor: "#fff",
+              width: Layout.window.width,
+              borderTopWidth: index === 0 ? 1 : 0,
+              paddingBottom: index === 0 ? insets.bottom : 0,
+            }}
+          >
+            {(index === 0 || showInput) && (
+              <View style={[styles.commentInput, { borderColor: "#ddd" }]}>
+                <BottomSheetTextInput
+                  value={comment}
+                  keyboardType="twitter"
+                  editable={!isCommenting}
+                  placeholder="Add a comment of at least 3 characters…"
+                  placeholderTextColor={"#888"}
+                  onChangeText={(text) => setComment(text)}
+                  style={[styles.input, { color: "#000", height: 64 }]}
+                />
+                <TouchableOpacity
+                  disabled={isCommenting || comment?.trim()?.length < 3}
+                  style={[
+                    styles.addCommentBtn,
+                    {
+                      borderWidth: 0.4,
+                      backgroundColor: "#eee",
+                      borderColor: primaryColor,
+                      opacity: comment?.trim()?.length < 3 ? 0.7 : 1,
+                    },
+                  ]}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    addComment(comment, () => setComment(""));
+                  }}
+                >
+                  {isCommenting ? (
+                    <ActivityIndicator
+                      size="small"
+                      color={"#000"}
+                      style={{ transform: [{ scale: 0.9 }] }}
+                    />
+                  ) : (
+                    <PaperPlane size={18} weight="fill" color={primaryColor} />
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </KeyboardAwareScrollView>
       </Animated.View>
     </BottomSheet>
   );
@@ -225,6 +243,7 @@ const styles = StyleSheet.create({
   container: {
     gap: 16,
     overflow: "hidden",
+    position: "relative",
     alignItems: "center",
     flexDirection: "column",
   },

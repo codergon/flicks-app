@@ -68,8 +68,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   actionBtn: {
-    width: 30,
-    height: 30,
+    width: 36,
+    height: 36,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -115,6 +115,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
+  },
+
+  nftSubscription: {
+    gap: 5,
+    flex: 1,
+    paddingTop: 2,
+    paddingRight: 16,
+    flexDirection: "row",
+  },
+  nftImage: {
+    width: 16,
+    height: 16,
+    marginLeft: 4,
+    borderRadius: 40,
+    overflow: "hidden",
+  },
+  nftImage_img: {
+    width: "100%",
+    height: "100%",
   },
 });
 

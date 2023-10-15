@@ -68,7 +68,7 @@ export const styles = StyleSheet.create({
   postSettings: {
     gap: 8,
     width: "100%",
-    marginTop: 20,
+    marginTop: 10,
     flexDirection: "column",
   },
   postSettings__item: {

@@ -1,25 +1,54 @@
+import { IPost } from "typings/post";
 import Post from "components/shared/post";
-import { StyleSheet } from "react-native";
+import { useApp } from "providers/AppProvider";
+import { useCallback, useState } from "react";
+import { RefreshControl } from "react-native";
+import { StyleSheet, View } from "react-native";
+import EmptyState from "components/shared/emptyState";
 import { Tabs } from "react-native-collapsible-tab-view";
 
 const AccountPostsTab = () => {
-  const data = [1, 2, 3, 4, 5, 6];
+  const { usersPostQuery } = useApp();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await usersPostQuery.refetch();
+    setRefreshing(false);
+  }, []);
+
+  if (usersPostQuery.isLoading || usersPostQuery.error)
+    return (
+      <Tabs.ScrollView style={{ width: "100%" }}>
+        <EmptyState
+          error={usersPostQuery.error}
+          isLoading={usersPostQuery.isLoading}
+          data={{
+            loadingText: "Fetching posts...",
+            errorMessage: "An error occured while fetching posts",
+          }}
+        />
+      </Tabs.ScrollView>
+    );
+
   return (
     <Tabs.FlatList
-      data={data}
+      data={usersPostQuery.data as IPost[]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       renderItem={({ item, index }) => {
         return (
           <Post
-            isPaid={!true}
-            containsMedia={item % 2 == 0}
-            showBorder={index !== data?.length - 1}
+            post={item}
+            showBorder={index !== usersPostQuery.data?.length - 1}
           />
         );
       }}
-      contentContainerStyle={{ paddingBottom: 16 }}
-      keyExtractor={(item, index) => index.toString()}
+      contentContainerStyle={{ paddingBottom: 50 }}
+      keyExtractor={(item, index) => item?.id ?? index.toString()}
     />
   );
 };

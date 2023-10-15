@@ -10,6 +10,8 @@ import { primaryColor } from "constants/Colors";
 import { RgText } from "components/_ui/typography";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 
+import { Tabs, MaterialTabBar } from "react-native-collapsible-tab-view";
+
 const av = new Animated.Value(0);
 av.addListener(() => {
   return;
@@ -45,40 +47,70 @@ const SearchResults = () => {
 
   return (
     <View style={[styles.container]}>
-      <TabView
+      <Tabs.Container
         lazy
-        onIndexChange={setIndex}
-        renderScene={renderScene}
-        navigationState={{ index, routes }}
-        initialLayout={{ width: Layout.window.width }}
-        renderLazyPlaceholder={_renderLazyPlaceholder}
+        tabBarHeight={70}
+        snapThreshold={0.5}
+        // @ts-ignore
+        headerContainerStyle={{
+          shadowRadius: 0,
+          shadowOffset: {
+            height: 0,
+          },
+        }}
         renderTabBar={(props) => (
-          <TabBar
+          <MaterialTabBar
             {...props}
+            scrollEnabled
+            inactiveColor="#444"
             indicatorStyle={{
-              height: 1.6,
-              borderRadius: 4,
+              height: 2,
               backgroundColor: primaryColor,
             }}
-            style={{
-              height: 44,
-              borderBottomWidth: 1,
-              borderBottomColor: "#ececec",
-              backgroundColor: "#fff",
+            tabStyle={{
+              width: "auto",
+              paddingTop: 6,
+              height: "auto",
+              marginBottom: 0,
+              paddingBottom: 10,
+              marginVertical: 0,
+              paddingHorizontal: 10,
             }}
-            renderLabel={({ route, focused, color }) => (
-              <RgText
-                style={{
-                  fontSize: 15,
-                  color: focused ? "#000" : "#888",
-                }}
-              >
-                {route.title}
-              </RgText>
-            )}
+            labelStyle={{
+              opacity: 1,
+              fontSize: 14,
+              fontWeight: "100",
+              textTransform: "capitalize",
+              fontFamily: "DMSans-Medium",
+            }}
+            contentContainerStyle={{
+              gap: 16,
+              paddingVertical: 0,
+              paddingHorizontal: 20,
+            }}
+            style={{
+              height: "auto",
+              paddingVertical: 0,
+              borderBottomWidth: 1,
+              backgroundColor: "#fff",
+              borderBottomColor: "#ececec",
+            }}
           />
         )}
-      />
+      >
+        <Tabs.Tab name="All">
+          <AllResults />
+        </Tabs.Tab>
+        <Tabs.Tab name="Posts">
+          <PostsTab />
+        </Tabs.Tab>
+        <Tabs.Tab name="Creators">
+          <CreatorsTab />
+        </Tabs.Tab>
+        <Tabs.Tab name="Media">
+          <MediaTab />
+        </Tabs.Tab>
+      </Tabs.Container>
     </View>
   );
 };

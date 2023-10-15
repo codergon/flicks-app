@@ -1,6 +1,15 @@
-import { Stack } from "expo-router";
+import { useCallback } from "react";
+import { StatusBar } from "react-native";
+import { Stack, useFocusEffect } from "expo-router";
 
 const HomeLayout = () => {
+  useFocusEffect(
+    useCallback(() => {
+      // Change status bar color
+      StatusBar.setBarStyle("dark-content");
+    }, [])
+  );
+
   return (
     <Stack
       initialRouteName="index"

@@ -1,17 +1,19 @@
 import { Fragment, useState } from "react";
 import { styles } from "./discover.styles";
-import SearchOverlay from "./searchOverlay";
 import Content from "components/discover/content";
 import { Container } from "components/_ui/custom";
+import { RgText } from "components/_ui/typography";
 import Searchbar from "components/_common/Searchbar";
-import { RgText, Text } from "components/_ui/typography";
-import { MagnifyingGlass } from "phosphor-react-native";
+import SearchHistory from "./searchOverlay/searchHistory";
 import MasonryList from "@react-native-seoul/masonry-list";
 import { Keyboard, TouchableOpacity, View } from "react-native";
+import { useApp } from "providers/AppProvider";
 
 const Discover = () => {
   const [search, setSearch] = useState("");
-  const [showResults, setShowResults] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  const { setSearchQuery } = useApp();
 
   return (
     <Container>
@@ -24,38 +26,37 @@ const Discover = () => {
           },
         ]}
       >
-        {true ? (
-          <Fragment>
-            <Searchbar
-              value={search}
-              onFocus={() => {
-                setShowResults(true);
+        <Fragment>
+          <Searchbar
+            value={search}
+            onFocus={() => {
+              setShowOverlay(true);
+            }}
+            onChangeText={setSearch}
+          />
+          {showOverlay && (
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => {
+                setShowOverlay(false);
+                setSearch("");
+                Keyboard.dismiss();
+                setSearchQuery({
+                  data: null,
+                  loading: false,
+                  error: null,
+                });
               }}
-              onChangeText={setSearch}
-            />
-            {showResults && (
-              <TouchableOpacity
-                onPress={() => {
-                  setShowResults(false);
-                  setSearch("");
-                  Keyboard.dismiss();
-                }}
-                style={styles.cancelSearch}
-              >
-                <RgText>Cancel</RgText>
-              </TouchableOpacity>
-            )}
-          </Fragment>
-        ) : (
-          <>
-            <Text style={[{ fontSize: 18 }]}>Discover</Text>
-            <MagnifyingGlass size={18} weight="bold" />
-          </>
-        )}
+              style={styles.cancelSearch}
+            >
+              <RgText>Cancel</RgText>
+            </TouchableOpacity>
+          )}
+        </Fragment>
       </View>
 
       <View style={styles.discover_body}>
-        {showResults ? <SearchOverlay search={search} /> : null}
+        {showOverlay && <SearchHistory setSearch={setSearch} />}
 
         <MasonryList
           data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}

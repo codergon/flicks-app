@@ -39,14 +39,18 @@ export const unstable_settings = {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { openCreateContentModal } = useModals();
-  const { connectedAccount, isAuthenticating } = useAccount();
+  const { userData, isAuthenticating, userSignature } = useAccount();
 
   if (isAuthenticating) {
-    return <Text>Flicks</Text>;
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Flicks</Text>
+      </View>
+    );
   }
 
-  if (!connectedAccount) {
-    return <Redirect href="/onboarding/" />;
+  if (!userData) {
+    return <Redirect href={`/(onboarding)${userSignature ? "/setup" : ""}`} />;
   }
 
   return (
@@ -109,7 +113,10 @@ export default function TabLayout() {
                   backgroundColor: "transparent",
                 }}
               >
-                <Icons.Create size={30} color={"#000"} />
+                <Icons.Create
+                  size={30}
+                  color={colorScheme === "dark" ? "#fff" : "#000"}
+                />
               </TouchableOpacity>
             );
           },

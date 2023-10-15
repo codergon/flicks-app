@@ -1,7 +1,6 @@
 import Layout from "constants/Layout";
 import { padding } from "helpers/styles";
 import { StyleSheet } from "react-native";
-import { primaryColor } from "constants/Colors";
 
 const styles = StyleSheet.create({
   header: {
@@ -39,6 +38,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
 
+  // user bio
+  userbio: {
+    width: "100%",
+    flexDirection: "column",
+  },
+  bioInput: {
+    width: "100%",
+    ...padding(12, 16),
+  },
+
   domainNameToggle: {
     width: "100%",
     ...padding(10, 12),
@@ -47,10 +56,12 @@ const styles = StyleSheet.create({
   },
 
   continueBtn: {
+    gap: 10,
     height: 46,
     width: "100%",
     borderRadius: 30,
     alignItems: "center",
+    flexDirection: "row",
     justifyContent: "center",
   },
 });

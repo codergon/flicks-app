@@ -1,6 +1,11 @@
 import "react-native-url-polyfill/auto";
-import { getRandomValues as expoCryptoGetRandomValues } from "expo-crypto";
 import { Buffer } from "buffer";
+import { getRandomValues as expoCryptoGetRandomValues } from "expo-crypto";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en.json";
+
+TimeAgo.addDefaultLocale(en);
+
 global.Buffer = Buffer;
 
 // getRandomValues polyfill

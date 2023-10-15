@@ -9,7 +9,8 @@ const SearchOverlay = ({ search = "" }) => {
       onTouchStart={() => Keyboard.dismiss()}
       style={[styles.overlay, { backgroundColor: "#fff" }]}
     >
-      {true ? <SearchHistory /> : <SearchResults />}
+      <SearchHistory />
+      {/* {true ? <SearchHistory /> : <SearchResults />} */}
     </View>
   );
 };

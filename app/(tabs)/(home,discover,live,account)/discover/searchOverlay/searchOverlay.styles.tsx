@@ -21,10 +21,11 @@ export const styles = StyleSheet.create({
     gap: 14,
     width: "100%",
     paddingVertical: 16,
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     flexDirection: "column",
   },
   keyword: {
+    gap: 14,
     paddingRight: 2,
     flexDirection: "row",
     alignItems: "center",
@@ -32,6 +33,7 @@ export const styles = StyleSheet.create({
   },
   keyword_details: {
     gap: 12,
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -48,5 +50,13 @@ export const styles = StyleSheet.create({
     width: "100%",
     paddingVertical: 16,
     flexDirection: "column",
+  },
+
+  closebtn: {
+    width: 26,
+    height: 26,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
