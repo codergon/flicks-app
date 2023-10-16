@@ -39,6 +39,9 @@ const CreateContentModal = () => {
       handleIndicatorStyle={{
         backgroundColor: "rgba(0,0,0,0.2)",
       }}
+      handleStyle={{
+        backgroundColor: "transparent",
+      }}
       backdropComponent={(props: BottomSheetBackdropProps) => (
         <BottomSheetBackdrop
           {...props}

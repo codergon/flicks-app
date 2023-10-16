@@ -1,9 +1,9 @@
-import AccountWishItem from "components/account/wishItem";
-import { ListPlus } from "phosphor-react-native";
 import { useRef } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Tabs } from "react-native-collapsible-tab-view";
+import { ListPlus } from "phosphor-react-native";
 import { Swipeable } from "react-native-gesture-handler";
+import { Tabs } from "react-native-collapsible-tab-view";
+import AccountWishItem from "components/account/wishItem";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 const AccountWishlist = () => {
   const data = [
@@ -62,7 +62,7 @@ const AccountWishlist = () => {
         style={{
           zIndex: 6,
           right: 20,
-          bottom: 30,
+          bottom: 80,
           padding: 10,
           elevation: 2,
           borderRadius: 50,

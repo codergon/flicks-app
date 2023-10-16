@@ -1,87 +1,73 @@
+import axios from "axios";
+import { ArrowLeftRight, Image } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import EmptyState from "components/shared/emptyState";
+import { useAccount } from "providers/AccountProvider";
 import { Tabs } from "react-native-collapsible-tab-view";
+import { RefreshControl } from "react-native-gesture-handler";
 import AccountTransactionItem from "components/account/transactionItem";
 
 const AccountTransactons = () => {
-  const data = [
+  const { userSignature } = useAccount();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const { data, isLoading, error, refetch } = useQuery(
+    ["account-txns", userSignature?.publicKey],
+    async () =>
+      axios
+        .get(`/transactions/`, {
+          headers: {
+            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          },
+        })
+        .then((res) => res.data?.data?.results),
     {
-      id: 1,
-      type: "deposit",
-      amount: 50,
-    },
-    {
-      id: 2,
-      type: "withdrawal",
-      amount: 20,
-    },
-    {
-      id: 3,
-      type: "credit",
-      amount: 10,
-      for: "tip",
-      from: "Johnpxl_",
-      tip_item: "coffee",
-    },
-    {
-      id: 4,
-      type: "debit",
-      amount: 10,
-      to: "sandra",
-      for: "tip",
-      tip_item: "mug",
-    },
-    {
-      id: 5,
-      type: "debit",
-      amount: 15,
-      to: "bumble",
-      for: "wishlist",
-    },
-    {
-      id: 6,
-      type: "credit",
-      amount: 12,
-      for: "wishlist",
-      from: "marie",
-    },
-    {
-      id: 7,
-      type: "debit",
-      amount: 15,
-      to: "sertysol",
-      for: "subscription",
-    },
-    {
-      id: 8,
-      type: "credit",
-      amount: 12,
-      for: "subscription",
-      from: "janedoe",
-    },
-    {
-      id: 9,
-      type: "debit",
-      amount: 24,
-      to: "muchay",
-      for: "purchase",
-    },
-    {
-      id: 10,
-      type: "credit",
-      amount: 17,
-      for: "purchase",
-      from: "pluto",
-    },
-  ];
+      enabled: !!userSignature?.signature,
+    }
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, []);
+
+  if (isLoading || error || !data || data.length === 0)
+    return (
+      <Tabs.ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        style={{ width: "100%" }}
+      >
+        <EmptyState
+          emptyIcon={
+            <ArrowLeftRight size={34} color={"#000"} strokeWidth={1.4} />
+          }
+          error={error}
+          isLoading={isLoading}
+          data={{
+            loadingText: "Loading transactions...",
+            message: "No transactions found",
+            errorMessage: "An error occured while loading transactions",
+          }}
+        />
+      </Tabs.ScrollView>
+    );
 
   return (
     <Tabs.FlatList
       data={data}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       renderItem={({ item, index }) => {
         return (
           <AccountTransactionItem
-            item={item}
+            data={item}
             showBorder={index !== data.length - 1}
           />
         );

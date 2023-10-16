@@ -8,6 +8,7 @@ interface EmptyStateProps {
     loadingText?: string;
     errorMessage?: string;
   };
+  emptyIcon?: React.ReactNode;
   errorIcon?: React.ReactNode;
   icon?: React.ReactNode;
   isLoading?: boolean;
@@ -19,6 +20,7 @@ const EmptyState = ({
   errorIcon,
   data,
   icon,
+  emptyIcon,
 }: EmptyStateProps) => {
   return (
     <View
@@ -30,7 +32,11 @@ const EmptyState = ({
       ]}
     >
       <View style={{ gap: 12, flexDirection: "column", alignItems: "center" }}>
-        {error && !isLoading ? errorIcon : icon}
+        {error && !isLoading
+          ? errorIcon
+          : !error && !isLoading
+          ? emptyIcon
+          : icon}
         <RgText style={{ fontSize: 16, color: "#000" }}>
           {isLoading
             ? data?.loadingText || "Loading..."

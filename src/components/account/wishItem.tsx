@@ -114,7 +114,7 @@ const AccountWishItem = ({
                 // opacity: fulfilled ? 0.7 : 1,
               },
             ]}
-            source={require("assets/images/mock/15.png")}
+            source={require("assets/images/mock/1.png")}
           />
 
           {fulfilled && (

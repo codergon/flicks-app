@@ -47,7 +47,7 @@ const Creator = ({ item, size, badge }: CreatorProps) => {
           style={[styles.creatorAvatar_image]}
           placeholder={"LKN]Rv%2Tw=w]~RBVZRi};RPxuwH"}
           source={{
-            uri: "https://www.cosmos.so/wp-content/uploads/2023/05/vortex80.jpg",
+            uri: item?.image_url,
           }}
         />
       </View>

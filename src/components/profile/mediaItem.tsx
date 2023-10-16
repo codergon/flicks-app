@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Play, Stack } from "phosphor-react-native";
 import { TouchableOpacity, View } from "react-native";
+import { ResizeMode, Video } from "expo-av";
 
 interface ContentProps {
   item: any;
@@ -13,10 +14,10 @@ const ProfileMediaItem = ({ item }: ContentProps) => {
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={() => {
-        // router.push({
-        //   pathname: `/(tabs)/(discover)/discover/${item.id}`,
-        //   params: { item: item },
-        // });
+        router.push({
+          pathname: `/mediaView/`,
+          params: { media_type: item?.media_type, url: item?.url },
+        });
       }}
       style={[
         styles.content,
@@ -34,17 +35,28 @@ const ProfileMediaItem = ({ item }: ContentProps) => {
           },
         ]}
       >
-        {Math.random() > 0.6 ? (
+        {item?.media_type === "video" ? (
           <Play weight="fill" size={14} color="#fff" />
         ) : null}
       </View>
 
-      <Image
-        transition={300}
-        contentFit="cover"
-        style={[styles.mediaImage]}
-        source={require("assets/images/mock/3.png")}
-      />
+      {item?.media_type === "image" ? (
+        <Image
+          transition={300}
+          contentFit="cover"
+          style={[styles.mediaImage]}
+          source={{ uri: item?.url }}
+          placeholder={"LIG+2d-;yDv{P;s+MvVrv0WF+FOt"}
+        />
+      ) : (
+        <Video
+          shouldPlay={false}
+          style={styles.mediaImage}
+          useNativeControls={false}
+          source={{ uri: item?.url }}
+          resizeMode={ResizeMode.COVER}
+        />
+      )}
     </TouchableOpacity>
   );
 };

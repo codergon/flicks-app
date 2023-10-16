@@ -17,6 +17,7 @@ import Toast, {
 } from "react-native-toast-message";
 import Layout from "constants/Layout";
 import DepositAddressesModal from "components/modals/deposit-address";
+import WithdrawalModal from "components/modals/withdraw-popup";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -84,6 +85,7 @@ function RootLayoutNav() {
         <PostInteractionsModal />
         <EditProfileModal />
         <DepositAddressesModal />
+        <WithdrawalModal />
 
         <Toast
           config={{

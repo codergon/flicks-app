@@ -34,7 +34,7 @@ const LiveStreamItem = ({ item, showBorder = true }: ContentProps) => {
           transition={300}
           contentFit="cover"
           style={[styles.image]}
-          source={require("assets/images/mock/19.png")}
+          source={require("assets/images/mock/1.png")}
         />
       </View>
 
@@ -123,7 +123,7 @@ const LiveStreamItem = ({ item, showBorder = true }: ContentProps) => {
                 transition={300}
                 contentFit="cover"
                 style={[styles.creatorAvatar_image]}
-                source={require("assets/images/mock/4.png")}
+                source={require("assets/images/mock/1.png")}
               />
             </View>
             <View style={[styles.creatorInfo]}>

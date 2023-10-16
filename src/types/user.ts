@@ -16,6 +16,7 @@ export interface Creator {
   subscribers_count: number;
   suspension_reason: string;
   subscription_type: string;
+  is_subscribed: boolean;
 }
 
 export interface Wallet {

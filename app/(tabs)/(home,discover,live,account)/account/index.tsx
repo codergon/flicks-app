@@ -1,18 +1,22 @@
 import { Image } from "expo-image";
 import styles from "./account.styles";
 import { padding } from "helpers/styles";
-import { Copy } from "lucide-react-native";
+import { Copy, RefreshCcw } from "lucide-react-native";
 import { Pencil } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
 import { primaryColor } from "constants/Colors";
 import { useModals } from "providers/ModalsProvider";
 import { RgText, Text } from "components/_ui/typography";
-import AccountHeaderBtns from "components/account/header";
 import { View, StatusBar, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs, MaterialTabBar } from "react-native-collapsible-tab-view";
-import { EyeSlash, PaperPlane, ArrowFatLineDown } from "phosphor-react-native";
+import {
+  EyeSlash,
+  PaperPlane,
+  ArrowFatLineDown,
+  ArrowCounterClockwise,
+} from "phosphor-react-native";
 
 import AccountPostsTab from "./_tabs/posts";
 import AccountMediaTab from "./_tabs/gallery";
@@ -23,10 +27,14 @@ import { useAccount } from "providers/AccountProvider";
 import AccountTransactons from "./_tabs/AccountTransactions";
 
 const UserAccountHeader = () => {
-  const { userData } = useAccount();
+  const { userData, fetchUserData } = useAccount();
   const insets = useSafeAreaInsets();
   const [hideBalance, setHideBalance] = useState(false);
-  const { openUpdateAccountModal, openDepositAddressesModal } = useModals();
+  const {
+    openUpdateAccountModal,
+    openWithdrawalModal,
+    openDepositAddressesModal,
+  } = useModals();
 
   return (
     <View
@@ -122,7 +130,15 @@ const UserAccountHeader = () => {
                   Number(userData?.subscribers_count) > 0
                     ? userData?.subscribers_count
                     : 0
-                } subscribers`}{" "}
+                } subscriber${
+                  (userData?.subscribers_count &&
+                  !isNaN(userData?.subscribers_count) &&
+                  Number(userData?.subscribers_count) > 0
+                    ? userData?.subscribers_count
+                    : 0) > 1
+                    ? "s"
+                    : ""
+                }`}{" "}
                 {`• ${
                   userData?.contents_count &&
                   !isNaN(userData?.contents_count) &&
@@ -197,7 +213,16 @@ const UserAccountHeader = () => {
                     setHideBalance((p) => !p);
                   }}
                 >
-                  <EyeSlash size={17} color="#000" weight="fill" />
+                  <EyeSlash size={18} color="#000" weight="fill" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{ ...padding(4, 2) }}
+                  onPressIn={() => {
+                    fetchUserData(true);
+                  }}
+                >
+                  <RefreshCcw size={15} color="#000" strokeWidth={2.3} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -212,6 +237,7 @@ const UserAccountHeader = () => {
               },
               {
                 label: "Withdraw",
+                onPress: openWithdrawalModal,
                 icon: <PaperPlane size={14} color="#000" weight="bold" />,
               },
             ].map((item, index) => {
@@ -360,11 +386,11 @@ const UserAccount = () => {
         <Tabs.Tab name="Media">
           <AccountMediaTab />
         </Tabs.Tab>
-        <Tabs.Tab name="Upcoming">
-          <AccountUpcomingStreams />
-        </Tabs.Tab>
         <Tabs.Tab name="Transactions">
           <AccountTransactons />
+        </Tabs.Tab>
+        <Tabs.Tab name="Upcoming">
+          <AccountUpcomingStreams />
         </Tabs.Tab>
         <Tabs.Tab name="Wishlist">
           <AccountWishlist />

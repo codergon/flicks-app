@@ -1,11 +1,23 @@
+import { StyleSheet, View } from "react-native";
+import { Tabs } from "react-native-collapsible-tab-view";
 import ProfileWishItem from "components/profile/wishItem";
-import { FlatList, StyleSheet, View } from "react-native";
 
 const ProfileWishlist = () => {
-  const data = [1, 2, 3];
+  const data = [
+    {
+      id: Math.random() * Math.random(),
+    },
+    {
+      id: Math.random() * Math.random(),
+    },
+    {
+      id: Math.random() * Math.random(),
+    },
+  ];
+
   return (
     <View style={[styles.wishlist]}>
-      <FlatList
+      <Tabs.FlatList
         data={data}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
@@ -14,7 +26,8 @@ const ProfileWishlist = () => {
         }}
         contentContainerStyle={{
           gap: 14,
-          paddingVertical: 16,
+          paddingTop: 16,
+          paddingBottom: 20,
           paddingHorizontal: 16,
         }}
         keyExtractor={(item, index) => index.toString()}

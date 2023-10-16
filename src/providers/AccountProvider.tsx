@@ -23,6 +23,7 @@ import {
   decryptPayload,
   encryptPayload,
 } from "utils/phantom";
+import { RecentSearches } from "typings/common";
 
 const NETWORK = clusterApiUrl("mainnet-beta");
 
@@ -69,6 +70,9 @@ export default function AccountProvider(props: AccountProviderProps) {
     useLargeStorageState<Creator>("userData");
   const [[isLoadingSig, userSignature], setUserSignature] =
     useStorageState<SignedMessage>("userSignature");
+
+  const [[isLoadingSearches, recentSearches], setRecentSearches] =
+    useLargeStorageState<RecentSearches>("recentSearches");
 
   // connect acct
   const [acctSNS, setAcctSNS] = useState<string>("");
@@ -204,7 +208,7 @@ export default function AccountProvider(props: AccountProviderProps) {
         },
       });
 
-      if (data?.data) setuserData(data);
+      if (data?.data) setuserData(data?.data);
     } catch (e) {
       router.replace("/(onboarding)/setup");
     } finally {
@@ -314,20 +318,13 @@ export default function AccountProvider(props: AccountProviderProps) {
 
   // disconnect wallet from app
   const disconnect = async () => {
-    const payload = {
-      session,
-    };
-    const [nonce, encryptedPayload] = encryptPayload(payload, sharedSecret);
-
-    const params = new URLSearchParams({
-      dapp_encryption_public_key: bs58.encode(dappKeyPair.publicKey),
-      nonce: bs58.encode(nonce),
-      redirect_link: onDisconnectRedirectLink,
-      payload: bs58.encode(encryptedPayload),
-    });
-
-    const url = buildUrl("disconnect", params);
-    Linking.openURL(url);
+    setuserData(null);
+    setSession(undefined);
+    setUserSignature(null);
+    setPhantomWalletPublicKey(undefined);
+    setSharedSecret(undefined);
+    setAcctSNS("");
+    setRecentSearches(null);
   };
 
   return (

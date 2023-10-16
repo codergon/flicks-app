@@ -1,69 +1,328 @@
-import { useEffect, useState } from "react";
+import axios from "axios";
 import { Image } from "expo-image";
 import styles from "./profile.styles";
-import Layout from "constants/Layout";
 import { padding } from "helpers/styles";
-import { StatusBar } from "expo-status-bar";
+import { Copy, RefreshCcw } from "lucide-react-native";
+import { Pencil } from "lucide-react-native";
+import { useCallback, useState } from "react";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { primaryColor } from "constants/Colors";
-import { useLocalSearchParams } from "expo-router";
+import { useModals } from "providers/ModalsProvider";
 import { RgText, Text } from "components/_ui/typography";
-import ProfileHeaderBtns from "components/profile/header";
-import { TouchableOpacity, View, Animated } from "react-native";
-import { SceneMap, TabBar, TabView } from "react-native-tab-view";
+import {
+  View,
+  StatusBar,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Tabs, MaterialTabBar } from "react-native-collapsible-tab-view";
+import { EyeSlash, PaperPlane, ArrowFatLineDown } from "phosphor-react-native";
 
-import PostsTab from "./_tabs/posts";
-import MediaGallery from "./_tabs/gallery";
+import ProfilePostsTab from "./_tabs/posts";
+import ProfileMediaTab from "./_tabs/gallery";
 import ProfileWishlist from "./_tabs/wishlist";
 import ProfileUpcomingStreams from "./_tabs/upcoming";
-import SuggestedAccounts from "components/shared/suggestions";
 
-import * as ScreenCapture from "expo-screen-capture";
+import shortenAddress from "utils/shortenAddress";
+import { useAccount } from "providers/AccountProvider";
+import { useQuery } from "@tanstack/react-query";
+import ProfileHeaderBtns from "components/profile/header";
+import { Creator } from "typings/user";
+import Toast from "react-native-toast-message";
 
-const av = new Animated.Value(0);
-av.addListener(() => {
-  return;
-});
+const UserProfileHeader = ({
+  userData,
+  refetch,
+  offsetTop = true,
+}: {
+  refetch?: () => void;
+  offsetTop?: boolean;
+  userData: Creator | null;
+}) => {
+  const insets = useSafeAreaInsets();
+  const { userData: currentUser, userSignature } = useAccount();
 
-const renderScene = SceneMap({
-  posts: PostsTab,
-  media: MediaGallery,
-  upcoming: ProfileUpcomingStreams,
-  wishlist: ProfileWishlist,
-});
+  const [subscribing, setSubscribing] = useState(false);
 
-const UserProfile = () => {
-  const { profile } = useLocalSearchParams<{ profile: string }>();
+  const handleSubscribe = async (shouldSubscribe: boolean) => {
+    if (!userSignature) return;
 
-  const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: "posts", title: "Posts" },
-    { key: "media", title: "Media" },
-    { key: "upcoming", title: "Upcoming" },
-    { key: "wishlist", title: "Wishlist" },
-  ]);
+    try {
+      setSubscribing(true);
 
-  const _renderLazyPlaceholder = ({
-    route,
-  }: {
-    route: {
-      title: string;
-    };
-  }) => (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <RgText>Loading {route.title}…</RgText>
+      await axios.post(
+        `/subscriptions/creators/${userData?.address}/subscribe`,
+        undefined,
+        {
+          headers: {
+            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          },
+        }
+      );
+
+      await refetch?.();
+    } catch (e: any) {
+      console.log(e?.response?.data?.message);
+
+      Toast.show({
+        type: "error",
+        topOffset: insets.top + 10,
+        text1: "Subscription failed",
+        text2: "An error occured while subscribing to this creator",
+      });
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
+  return (
+    <View
+      pointerEvents="box-none"
+      style={[
+        styles.profileHeader,
+        {
+          marginTop: offsetTop ? -insets.top : 0,
+        },
+      ]}
+    >
+      <ProfileHeaderBtns />
+      <View
+        pointerEvents="none"
+        style={[
+          styles.banner,
+          {
+            backgroundColor: "#f4f4f4",
+          },
+        ]}
+      >
+        <Image
+          transition={300}
+          contentFit="cover"
+          style={[styles.bannerImg]}
+          source={{ uri: userData?.banner_url }}
+        />
+      </View>
+
+      <View style={styles.userDetails}>
+        <View
+          pointerEvents="none"
+          style={[
+            styles.avatar,
+            {
+              borderWidth: 3,
+              marginTop: -14,
+              borderColor: "#fff",
+            },
+          ]}
+        >
+          <Image
+            transition={300}
+            contentFit="cover"
+            style={[styles.avatar_image]}
+            source={{ uri: userData?.image_url }}
+          />
+        </View>
+
+        <View style={[styles.info_actions]}>
+          <View style={[styles.creatorInfo]}>
+            <View
+              style={{
+                gap: 5,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Text style={[styles.creatorInfo__name]}>
+                {userData?.moniker}
+              </Text>
+
+              <RgText style={[styles.creatorInfo__desc, { color: "#676C75" }]}>
+                {"•  " + shortenAddress(userData?.address || "", 4)}
+              </RgText>
+
+              <TouchableOpacity
+                // style={[styles.followBtn]}
+                onPress={() => {}}
+                activeOpacity={0.8}
+                style={{
+                  ...padding(4, 4),
+                  // backgroundColor: "#eee",
+                  // borderRadius: 4,
+                }}
+              >
+                <Copy size={12} color="#676C75" strokeWidth={3} />
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                gap: 7,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <RgText style={[styles.creatorInfo__desc, { color: "#676C75" }]}>
+                {/* {shortenAddress(userData?.address || "")} */}
+                {`${
+                  userData?.subscribers_count &&
+                  !isNaN(userData?.subscribers_count) &&
+                  Number(userData?.subscribers_count) > 0
+                    ? userData?.subscribers_count
+                    : 0
+                } subscriber${
+                  (userData?.subscribers_count &&
+                  !isNaN(userData?.subscribers_count) &&
+                  Number(userData?.subscribers_count) > 0
+                    ? userData?.subscribers_count
+                    : 0) > 1
+                    ? "s"
+                    : ""
+                }`}{" "}
+                {`• ${
+                  userData?.contents_count &&
+                  !isNaN(userData?.contents_count) &&
+                  Number(userData?.contents_count) > 0
+                    ? userData?.contents_count
+                    : 0
+                } contents`}
+              </RgText>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {userData?.bio && (
+        <View pointerEvents="none" style={[styles.bio]}>
+          <RgText>{userData?.bio}</RgText>
+        </View>
+      )}
+
+      <View style={[styles.accountStats]}>
+        <View pointerEvents="none" style={[styles.stats_row]}>
+          <View
+            style={{
+              gap: 32,
+              width: "100%",
+              flexDirection: "row",
+              // justifyContent: "space-between",
+            }}
+          >
+            <View style={{ flexDirection: "row" }}>
+              <RgText style={[{ fontSize: 15, color: "#444" }]}>
+                Subscription:{" "}
+              </RgText>
+              <Text style={{ paddingTop: 3 }}>
+                {userData?.subscription_type === "free"
+                  ? "Free"
+                  : userData?.subscription_type === "monetary"
+                  ? `$${userData?.subscription_info?.amount ?? "0.00"}/mo`
+                  : ``}
+              </Text>
+
+              {userData?.subscription_type === "nft" && (
+                <View style={[styles.nftSubscription]}>
+                  <View style={[styles.nftImage]}>
+                    <Image
+                      transition={300}
+                      contentFit="cover"
+                      style={[styles.nftImage_img]}
+                      source={{
+                        uri: userData?.subscription_info?.collection_image,
+                      }}
+                    />
+                  </View>
+                  <Text style={{ fontSize: 14.5 }}>
+                    {userData?.subscription_info?.collection_name}
+                    <RgText style={{ fontSize: 13, color: "#666" }}>
+                      {" "}
+                      {"(NFT Pass)"}
+                    </RgText>
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {userData?.address !== currentUser?.address && (
+        <TouchableOpacity
+          disabled={subscribing}
+          onPress={() => {
+            handleSubscribe(!!userData?.is_subscribed);
+          }}
+          style={[
+            {
+              marginTop: 4,
+              marginBottom: 4,
+              zIndex: 99,
+              borderWidth: 1,
+              borderRadius: 14,
+              ...padding(10, 12),
+              marginHorizontal: 16,
+              alignItems: "center",
+              paddingHorizontal: 16,
+              justifyContent: "center",
+
+              borderColor: userData?.is_subscribed ? "#ccc" : primaryColor,
+              backgroundColor: userData?.is_subscribed
+                ? "#transparent"
+                : primaryColor,
+            },
+          ]}
+        >
+          <RgText
+            style={{
+              fontSize: 14,
+              color: userData?.is_subscribed ? "#000" : "#fff",
+            }}
+          >
+            Subscribe{userData?.is_subscribed ? "d" : ""}
+          </RgText>
+
+          {subscribing && (
+            <ActivityIndicator
+              size={"small"}
+              style={{
+                right: 16,
+                position: "absolute",
+              }}
+              color={"#fff"}
+            />
+          )}
+        </TouchableOpacity>
+      )}
     </View>
   );
+};
 
-  // Prevent screenshots & screen recordings
-  ScreenCapture.usePreventScreenCapture();
-  useEffect(() => {
-    (async () => await ScreenCapture.preventScreenCaptureAsync())();
+const UserProfile = () => {
+  const { profile } = useLocalSearchParams();
 
-    const subscription = ScreenCapture.addScreenshotListener(() => {
-      alert("Screenshots are not allowed on this screen.");
-    });
-    return () => subscription.remove();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBarStyle("light-content");
+    }, [])
+  );
+
+  const insets = useSafeAreaInsets();
+  const { userSignature } = useAccount();
+
+  const { data, isLoading, error, refetch } = useQuery(
+    ["profile", userSignature?.publicKey, profile],
+    async () =>
+      axios
+        .get(`/creators/${profile}`, {
+          headers: {
+            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          },
+        })
+        .then((res) => res.data?.data),
+    {
+      enabled: !!userSignature?.signature && !!profile,
+    }
+  );
 
   return (
     <View
@@ -74,180 +333,72 @@ const UserProfile = () => {
         },
       ]}
     >
-      <StatusBar style="light" />
-
-      <ProfileHeaderBtns />
-
-      <View style={[styles.profileHeader]}>
-        <View
-          style={[
-            styles.banner,
-            {
-              backgroundColor: "#f4f4f4",
-            },
-          ]}
-        >
-          <Image
-            transition={300}
-            contentFit="cover"
-            style={[styles.bannerImg]}
-            source={require("assets/images/mock/5.png")}
-          />
-        </View>
-
-        <View style={styles.userDetails}>
-          <View
-            style={[
-              styles.avatar,
-              {
-                borderWidth: 3,
-                marginTop: -14,
-                borderColor: "#fff",
-              },
-            ]}
-          >
-            <Image
-              transition={300}
-              contentFit="cover"
-              style={[styles.avatar_image]}
-              source={require("assets/images/mock/6.png")}
-            />
-          </View>
-
-          <View style={[styles.info_actions]}>
-            <View style={[styles.creatorInfo]}>
-              <Text style={[styles.creatorInfo__name]}>Jackson Norman</Text>
-              <RgText style={[styles.creatorInfo__desc, { color: "#676C75" }]}>
-                436 subscribers • 32 contents
-              </RgText>
-            </View>
-
-            <TouchableOpacity
-              style={[
-                {
-                  zIndex: 99,
-                  borderWidth: 1,
-                  borderRadius: 30,
-                  ...padding(6, 12),
-                  alignItems: "center",
-                  paddingHorizontal: 16,
-                  justifyContent: "center",
-                  borderColor: "#ccc",
-                  // backgroundColor: primaryColor,
-                },
-              ]}
-            >
-              <RgText
-                style={{
-                  fontSize: 12,
-                  color: "#000",
-                  // letterSpacing: 0.2,
-                }}
-              >
-                Subscribed
-              </RgText>
-            </TouchableOpacity>
-
-            {/* <View style={[styles.actionBtns]}>
-              <TouchableOpacity style={[styles.actionBtn]}>
-                <Gift size={16} color="#000" />
-              </TouchableOpacity>
-            </View> */}
-          </View>
-        </View>
-
-        <View style={[styles.bio]}>
-          <RgText>
-            I’m a photographer and videographer based in New York City 📷📹
-          </RgText>
-        </View>
-      </View>
-
-      {/* Tabs */}
-      {true ? (
-        <View style={[styles.container]}>
-          <TabView
-            lazy
-            onIndexChange={setIndex}
-            renderScene={renderScene}
-            navigationState={{ index, routes }}
-            initialLayout={{ width: Layout.window.width }}
-            renderLazyPlaceholder={_renderLazyPlaceholder}
-            sceneContainerStyle={{
-              borderWidth: 0,
-              borderTopWidth: 1,
-              borderColor: "#ececec",
-            }}
-            renderTabBar={(props) => (
-              <TabBar
-                {...props}
-                indicatorStyle={{
-                  height: 2,
-                  backgroundColor: primaryColor,
-                }}
-                tabStyle={{
-                  width: "auto",
-                  paddingHorizontal: 4,
-                }}
-                gap={24}
-                contentContainerStyle={{
-                  width: Layout.window.width - 32,
-                }}
-                style={{
-                  height: 44,
-                  marginLeft: 16,
-                  width: Layout.window.width - 32,
-                  backgroundColor: "#fff", // transparent causes shadow issues & warnings
-                }}
-                renderLabel={({ route, focused, color }) => (
-                  <RgText
-                    style={{
-                      fontSize: 14,
-                      color: focused ? "#000" : "#888",
-                    }}
-                  >
-                    {route.title}
-                  </RgText>
-                )}
-              />
-            )}
-          />
-        </View>
+      {!data?.is_subscribed ? (
+        <UserProfileHeader
+          userData={data}
+          offsetTop={false}
+          refetch={refetch}
+        />
       ) : (
-        <View style={[styles.subscribeContainer]}>
-          <View
-            style={{
-              marginBottom: 20,
-              paddingHorizontal: 16,
-            }}
-          >
-            <TouchableOpacity
-              style={[
-                {
-                  width: "100%",
-                  borderRadius: 10,
-                  paddingVertical: 10,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: primaryColor,
-                },
-              ]}
-            >
-              <RgText
-                style={[
-                  {
-                    fontSize: 16,
-                    color: "#fff",
-                  },
-                ]}
-              >
-                Subscribe for free
-              </RgText>
-            </TouchableOpacity>
-          </View>
+        <Tabs.Container
+          lazy
+          tabBarHeight={70}
+          snapThreshold={0.5}
+          // @ts-ignore
+          headerContainerStyle={{
+            shadowRadius: 0,
+            shadowOffset: {
+              height: 0,
+            },
+          }}
+          containerStyle={{
+            top: insets.top + 0,
+          }}
+          renderHeader={() => <UserProfileHeader userData={data} />}
+          renderTabBar={(props) => (
+            <MaterialTabBar
+              {...props}
+              inactiveColor="#7b7b7b"
+              scrollEnabled
+              indicatorStyle={{
+                height: 2,
+                backgroundColor: primaryColor,
+              }}
+              tabStyle={{
+                width: "auto",
+                paddingHorizontal: 10,
+              }}
+              labelStyle={{
+                fontSize: 14,
+                textTransform: "capitalize",
+                fontFamily: "DMSans-Medium",
+              }}
+              contentContainerStyle={{ gap: 16 }}
+              style={{
+                height: 46,
 
-          <SuggestedAccounts />
-        </View>
+                // top: insets.top - 2,
+
+                borderBottomWidth: 1,
+                backgroundColor: "#fff",
+                borderBottomColor: "#f4f4f4",
+              }}
+            />
+          )}
+        >
+          <Tabs.Tab name="Posts">
+            <ProfilePostsTab profile={profile as string} />
+          </Tabs.Tab>
+          <Tabs.Tab name="Media">
+            <ProfileMediaTab profile={profile as string} />
+          </Tabs.Tab>
+          <Tabs.Tab name="Upcoming">
+            <ProfileUpcomingStreams />
+          </Tabs.Tab>
+          <Tabs.Tab name="Wishlist">
+            <ProfileWishlist />
+          </Tabs.Tab>
+        </Tabs.Container>
       )}
     </View>
   );

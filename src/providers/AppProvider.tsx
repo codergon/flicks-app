@@ -1,5 +1,5 @@
 import axios from "axios";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import { useAccount } from "./AccountProvider";
 import * as ImagePicker from "expo-image-picker";
 import { PresignedUrlResponse } from "typings/api";
@@ -59,12 +59,9 @@ const AppProvider = ({ children }: AppProviderProps) => {
     error: null,
   });
   const handleSearch = async (search: string) => {
-    console.log("search for this keyword");
     setSearchQuery((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      //
-
       const { data } = await axios.get("/creators/search", {
         params: {
           q: search,
@@ -74,7 +71,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
         },
       });
 
-      console.log(data);
+      setSearchQuery((prev) => ({ ...prev, data: data?.data }));
 
       handleRecentSearches(
         {
@@ -128,7 +125,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
         })
         .then((res) => res.data?.data?.results),
     {
-      enabled: !!userSignature,
+      enabled: !!userSignature?.signature,
     }
   );
 
@@ -311,20 +308,24 @@ const AppProvider = ({ children }: AppProviderProps) => {
       };
 
       // Create content
-      const { data: content } = await axios.post("/contents/", contentData, {
+      await axios.post("/contents/", contentData, {
         headers: {
           Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
         },
       });
 
-      console.log(content);
+      // refetch user data
+      await usersPostQuery.refetch();
+
+      // navigate to home
+      router.replace("/(tabs)/(account)/account");
     } catch (e: any) {
       console.log(e?.response?.data);
       Toast.show({
         type: "error",
         topOffset: insets.top + 10,
         text1: "Error uploading post",
-        text2: "Something went wrong while uploading your post",
+        text2: "Try selecting a smaller media",
       });
     } finally {
       setUploading(false);

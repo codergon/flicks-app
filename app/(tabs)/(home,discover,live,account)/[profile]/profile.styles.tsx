@@ -1,14 +1,8 @@
-import { padding } from "helpers/styles";
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  subscribeContainer: {
-    width: "100%",
-    marginTop: 30,
-  },
-
   container: {
-    flex: 1,
+    flexGrow: 1,
     width: "100%",
     flexDirection: "column",
   },
@@ -73,8 +67,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   actionBtn: {
-    width: 30,
-    height: 30,
+    width: 36,
+    height: 36,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -84,6 +78,61 @@ const styles = StyleSheet.create({
     marginTop: 12,
     flexDirection: "row",
     paddingHorizontal: 16,
+  },
+
+  // account stats
+  accountStats: {
+    gap: 10,
+    width: "100%",
+    marginTop: 6,
+    paddingTop: 10,
+    paddingBottom: 14,
+    flexDirection: "column",
+  },
+  stats_row: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    justifyContent: "space-between",
+  },
+
+  stats_group: {
+    gap: 18,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  statBtn_cover: {
+    // alignItems: "center",
+    flexDirection: "column",
+  },
+  statBtn: {
+    gap: 8,
+    borderRadius: 32,
+    paddingVertical: 9,
+    paddingHorizontal: 11,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+
+  nftSubscription: {
+    gap: 5,
+    flex: 1,
+    paddingTop: 2,
+    paddingRight: 16,
+    flexDirection: "row",
+  },
+  nftImage: {
+    width: 16,
+    height: 16,
+    marginLeft: 4,
+    borderRadius: 40,
+    overflow: "hidden",
+  },
+  nftImage_img: {
+    width: "100%",
+    height: "100%",
   },
 });
 

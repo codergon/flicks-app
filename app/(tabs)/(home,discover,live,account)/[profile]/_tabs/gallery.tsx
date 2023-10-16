@@ -1,46 +1,88 @@
-import { Fragment, useState } from "react";
+import axios from "axios";
 import { StyleSheet, View } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import EmptyState from "components/shared/emptyState";
+import { useAccount } from "providers/AccountProvider";
+import { Tabs } from "react-native-collapsible-tab-view";
 import ProfileMediaItem from "components/profile/mediaItem";
-import MasonryList from "@react-native-seoul/masonry-list";
+import { RefreshControl } from "react-native-gesture-handler";
+import { Image } from "lucide-react-native";
+import { useCallback, useState } from "react";
 
-const MediaGallery = () => {
-  const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const MediaGallery = ({ profile = "" }) => {
+  const { userSignature } = useAccount();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const { data, isLoading, error, refetch } = useQuery(
+    ["profile-media", userSignature?.publicKey, profile],
+    async () =>
+      axios
+        .get(`/contents/media/${profile}`, {
+          headers: {
+            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          },
+        })
+        .then((res) => res.data?.data?.results),
+    {
+      enabled: !!userSignature?.signature && !!profile,
+    }
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, []);
+
+  if (isLoading || error || !data || data.length === 0)
+    return (
+      <Tabs.ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        style={{ width: "100%" }}
+      >
+        <EmptyState
+          emptyIcon={<Image size={34} color={"#000"} strokeWidth={1.4} />}
+          error={error}
+          isLoading={isLoading}
+          data={{
+            loadingText: "Fetching media...",
+            errorMessage: "An error occured while fetching media",
+            message: "No media yet",
+          }}
+        />
+      </Tabs.ScrollView>
+    );
+
   return (
-    <View style={[styles.gallery]}>
-      <MasonryList
-        data={data}
-        numColumns={3}
-        renderItem={({ item, i }) => (
-          <Fragment>
-            <ProfileMediaItem
-              item={{
-                id: item,
-              }}
-            />
-          </Fragment>
-        )}
-        onEndReachedThreshold={0.1}
-        keyExtractor={(i) => i.toString()}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[styles.listContainer]}
-      />
-    </View>
+    <Tabs.MasonryFlashList
+      data={data}
+      numColumns={3}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      renderItem={({ item }) => <ProfileMediaItem item={item} />}
+      estimatedItemSize={200}
+      contentContainerStyle={{
+        ...styles.listContainer,
+      }}
+      ItemSeparatorComponent={() => <View style={{ height: 6 }} />}
+      onEndReachedThreshold={0.1}
+      keyExtractor={(i: any) => i.toString()}
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
+      style={[{ flex: 1 }]}
+    />
   );
 };
 
 export default MediaGallery;
 
 const styles = StyleSheet.create({
-  gallery: {
-    flex: 1,
-    gap: 14,
-    flexDirection: "column",
-  },
-
   listContainer: {
-    flexGrow: 1,
-    marginTop: 8,
+    paddingTop: 12,
     paddingBottom: 60,
     paddingHorizontal: 13,
   },

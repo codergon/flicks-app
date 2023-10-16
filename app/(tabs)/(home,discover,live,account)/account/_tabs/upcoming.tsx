@@ -1,7 +1,7 @@
+import { StyleSheet, View } from "react-native";
 import { Text } from "components/_ui/typography";
-import LiveStreamItem from "components/account/streamItem";
-import { ScrollView, StyleSheet, View } from "react-native";
 import { Tabs } from "react-native-collapsible-tab-view";
+import LiveStreamItem from "components/account/streamItem";
 
 const AccountUpcomingStreams = () => {
   const data = [

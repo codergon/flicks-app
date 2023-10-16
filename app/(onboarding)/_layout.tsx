@@ -14,8 +14,8 @@ const OnboardingLayout = () => {
     );
   }
 
-  if (userData) {
-    return <Redirect href={`/(tabs)/(discover)/discover`} />;
+  if (!!userData) {
+    return <Redirect href={`/(tabs)/(home)/home`} />;
   }
 
   return (

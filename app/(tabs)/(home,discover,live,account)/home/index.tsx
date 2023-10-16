@@ -1,137 +1,90 @@
-import {
-  View,
-  Animated,
-  FlatList,
-  StyleSheet,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-} from "react-native";
+import { Fragment, useCallback, useState } from "react";
 import Post from "components/shared/post";
 import Topbar from "components/home/topbar";
-import LottieView from "lottie-react-native";
 import { Container } from "components/_ui/custom";
-import { Fragment, useEffect, useRef, useState } from "react";
-import SuggestedAccounts from "components/shared/suggestions";
-import { StatusBar } from "expo-status-bar";
+import { View, FlatList, StyleSheet } from "react-native";
 
-const loadingAnimation = require("assets/lotties/loading.json");
+import axios from "axios";
+import { useAccount } from "providers/AccountProvider";
+import { useQuery } from "@tanstack/react-query";
+import { ScrollView } from "components/_ui/themed";
+import { RefreshControl } from "react-native-gesture-handler";
+import { CircleOff, List } from "lucide-react-native";
+import EmptyState from "components/shared/emptyState";
+import { IPost } from "typings/post";
 
 const Home = () => {
-  const refreshingHeight = 80;
-  const ref = useRef<FlatList>(null);
-  const lottieViewRef = useRef<LottieView>(null);
+  const { userSignature } = useAccount();
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [offsetY, setOffsetY] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [extraPaddingTop] = useState(new Animated.Value(0));
-
-  useEffect(() => {
-    if (isRefreshing) {
-      ref.current?.scrollToOffset({
-        offset: -300,
-        // animated: true,
-      });
-
-      // Animated.timing(extraPaddingTop, {
-      //   toValue: refreshingHeight,
-      //   duration: 0,
-      //   useNativeDriver: false,
-      // }).start();
-
-      // lottieViewRef?.current?.play();
-    } else {
-      // Animated.timing(extraPaddingTop, {
-      //   toValue: 0,
-      //   duration: 400,
-      //   useNativeDriver: false,
-      //   easing: Easing.elastic(1.3),
-      // }).start();
+  const { data, isLoading, error, refetch } = useQuery(
+    ["timeline", userSignature?.publicKey],
+    async () =>
+      axios
+        .get(`/contents/timeline`, {
+          headers: {
+            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          },
+        })
+        .then((res) => res.data?.results),
+    {
+      enabled: !!userSignature?.signature,
     }
-  }, [isRefreshing]);
+  );
 
-  function onScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
-    const { nativeEvent } = event;
-    const { contentOffset } = nativeEvent;
-    const { y } = contentOffset;
-    setOffsetY(y);
-  }
-
-  function onRelease() {
-    if (offsetY <= -refreshingHeight && !isRefreshing) {
-      setIsRefreshing(true);
-      setTimeout(() => {
-        setIsRefreshing(false);
-      }, 3000);
-    }
-  }
-
-  let progress = 0;
-  if (offsetY < 0 && !isRefreshing) {
-    progress = offsetY / -refreshingHeight;
-  }
-
-  function renderItem({ item, index }: { item: any; index: number }) {
-    return (
-      <Fragment>
-        <Post isPaid={index === 1} />
-        {index === 0 && <SuggestedAccounts />}
-      </Fragment>
-    );
-  }
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, []);
 
   return (
     <Container>
-      <StatusBar style="dark" />
-
-      {/* Top bar */}
       <Topbar />
 
-      <View
-        style={{
-          backgroundColor: "#f3f3f3",
-        }}
-      >
-        <LottieView
-          ref={lottieViewRef}
-          style={[
-            {
-              height: refreshingHeight,
-              backgroundColor: "#f3f3f3",
-            },
-            styles.lottieView,
-          ]}
-          progress={progress}
-          source={loadingAnimation}
-        />
-
-        <FlatList
-          ref={ref}
-          onScroll={onScroll}
-          data={[1, 2, 3]}
-          renderItem={renderItem}
-          onResponderRelease={onRelease}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.container]}
-          ListHeaderComponent={
-            <Animated.View
-              style={{
-                paddingTop: extraPaddingTop,
-              }}
-            />
+      {isLoading || error || !data || data.length === 0 ? (
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-        />
-
-        {/* <View style={[styles.loadingText]}>
-        <RgText
-          style={{
-            color: "#80848C",
-          }}
+          style={{ width: "100%" }}
         >
-          Loading ...
-        </RgText>
-      </View> */}
-      </View>
+          <EmptyState
+            emptyIcon={<List size={34} color={"#000"} strokeWidth={1.4} />}
+            errorIcon={<CircleOff size={34} color={"#000"} strokeWidth={1.4} />}
+            error={error}
+            isLoading={isLoading}
+            data={{
+              loadingText: "Fetching timeline...",
+              errorMessage: "An error occured while fetching timeline",
+              message: "Nothing here yet",
+            }}
+          />
+        </ScrollView>
+      ) : (
+        <View style={{ flex: 1 }}>
+          <FlatList
+            data={data}
+            style={{ flex: 1, width: "100%" }}
+            renderItem={({ item, index }) => {
+              return (
+                <Fragment key={index}>
+                  <Post
+                    post={item as IPost}
+                    showBorder={index !== data.length - 1}
+                  />
+                </Fragment>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.container]}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />
+        </View>
+      )}
     </Container>
   );
 };
@@ -141,7 +94,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    paddingBottom: 60,
+    paddingBottom: 40,
   },
 
   loadingText: {

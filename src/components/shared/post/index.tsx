@@ -12,16 +12,30 @@ import { useModals } from "providers/ModalsProvider";
 import PostCreator from "components/shared/postCreator";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LightText, RgText, Text } from "components/_ui/typography";
-import { Animated, FlatList, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Animated,
+  FlatList,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Gift, MessageCircle, GalleryVerticalEnd } from "lucide-react-native";
+import { useAccount } from "providers/AccountProvider";
+import Toast from "react-native-toast-message";
+import axios from "axios";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface PostProps {
   post: IPost;
   showBorder?: boolean;
+
+  showInteractions?: boolean;
 }
 
-const Post = ({ post, showBorder }: PostProps) => {
+const Post = ({ post, showBorder, showInteractions = true }: PostProps) => {
+  const insets = useSafeAreaInsets();
   const { handleLike } = useApp();
+  const { userSignature, userData } = useAccount();
   const { openPostIntractionsModal } = useModals();
 
   // Media items flatlist
@@ -50,6 +64,34 @@ const Post = ({ post, showBorder }: PostProps) => {
     }, 500),
     []
   );
+
+  const [unlocking, setUnlocking] = useState(false);
+
+  const handleUnlock = async () => {
+    if (!userSignature) return;
+
+    try {
+      setUnlocking(true);
+
+      await axios.post(`/contents/${post?.id}/pay`, undefined, {
+        headers: {
+          Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+        },
+      });
+
+      //  await refetch?.();
+    } catch (e: any) {
+      console.log(e?.response?.data?.message);
+      Toast.show({
+        type: "error",
+        topOffset: insets.top + 10,
+        text1: "Purchase failed",
+        text2: "An error occured while trying to purchase this content.",
+      });
+    } finally {
+      setUnlocking(false);
+    }
+  };
 
   return (
     <View
@@ -96,13 +138,28 @@ const Post = ({ post, showBorder }: PostProps) => {
                 style={[styles.post_mediaItem, styles.post_mediaItem__locked]}
               >
                 <Lock size={22} color="#80848C" />
-                <TouchableOpacity style={[styles.subscribeBtn]}>
+                <TouchableOpacity
+                  disabled={unlocking}
+                  onPress={handleUnlock}
+                  style={[styles.subscribeBtn]}
+                >
                   <Text style={[{ color: "#fff" }]}>
-                    Unlock content for 0.04sol
+                    Unlock content for {post?.price} USDC
                   </Text>
+
+                  {unlocking && (
+                    <ActivityIndicator
+                      size={"small"}
+                      style={{
+                        right: 16,
+                        position: "absolute",
+                      }}
+                      color={"#fff"}
+                    />
+                  )}
                 </TouchableOpacity>
 
-                {true && (
+                {post?.media?.length > 1 && (
                   <View style={[styles.post_mediaNumbers__locked]}>
                     <GalleryVerticalEnd
                       size={14}
@@ -116,7 +173,8 @@ const Post = ({ post, showBorder }: PostProps) => {
                         color: "#80848C",
                       }}
                     >
-                      3 Items
+                      {post?.media?.length}{" "}
+                      {post?.media?.length > 1 ? "items" : "item"}
                     </RgText>
                   </View>
                 )}
@@ -170,106 +228,108 @@ const Post = ({ post, showBorder }: PostProps) => {
         </View>
       )}
 
-      <View style={[styles.post_footer]}>
-        <View style={[styles.post_stats]}>
-          {/* Likes */}
-          <TouchableOpacity
-            onPress={() => {
-              setIsLiked((l) => !l);
-              setLikesCount((c) => (isLiked ? c - 1 : c + 1));
-              debouncedFetchData(!isLiked ? "like" : "unlike");
-            }}
-            style={[styles.post_statsItem]}
-          >
-            {isLiked ? (
-              <Heart
-                size={16}
-                fill="#FF2F40"
-                color={"#FF2F40"}
-                strokeWidth={2}
-              />
-            ) : (
-              <Heart size={16} color="#000" strokeWidth={2} />
-            )}
-            <RgText style={[styles.post_statsItemText]}>
-              {millify(likesCount, {
-                precision: 2,
-                lowercase: true,
-              })}
-            </RgText>
-          </TouchableOpacity>
-
-          {/* Comments */}
-          <TouchableOpacity
-            onPress={() => {
-              openPostIntractionsModal({
-                type: "comments",
-                data: {
-                  postId: post?.id || "",
-                  comments: post?.comments,
-                },
-              });
-            }}
-            style={[styles.post_statsItem]}
-          >
-            <MessageCircle size={15} color="#000" strokeWidth={2} />
-            <RgText style={[styles.post_statsItemText]}>
-              {millify(post?.comments_count ?? 0, {
-                precision: 2,
-                lowercase: true,
-              })}
-            </RgText>
-          </TouchableOpacity>
-        </View>
-
-        {/* Ellipses indicating current media item */}
-        {post?.media?.length > 1 && false && (
-          <View style={[styles.post_mediaDots]}>
-            {[1, 2, 3]?.map((_, index) => {
-              const dotWidth = scrollX.interpolate({
-                inputRange: [
-                  (index - 1) * Layout.window.width,
-                  index * Layout.window.width,
-                  (index + 1) * Layout.window.width,
-                ],
-                outputRange: [6, 12, 6],
-                extrapolate: "clamp",
-              });
-
-              const backgroundColor = scrollX.interpolate({
-                inputRange: [
-                  (index - 1) * Layout.window.width,
-                  index * Layout.window.width,
-                  (index + 1) * Layout.window.width,
-                ],
-                outputRange: ["#ddd", primaryColor, "#ddd"],
-                extrapolate: "clamp",
-              });
-
-              return (
-                <Animated.View
-                  key={index}
-                  style={[
-                    styles.post_mediaDot,
-                    {
-                      width: dotWidth,
-                      backgroundColor:
-                        index === currentIndex ? primaryColor : "#ddd",
-                    },
-                  ]}
+      {showInteractions && post?.is_purchased && (
+        <View style={[styles.post_footer]}>
+          <View style={[styles.post_stats]}>
+            {/* Likes */}
+            <TouchableOpacity
+              onPress={() => {
+                setIsLiked((l) => !l);
+                setLikesCount((c) => (isLiked ? c - 1 : c + 1));
+                debouncedFetchData(!isLiked ? "like" : "unlike");
+              }}
+              style={[styles.post_statsItem]}
+            >
+              {isLiked ? (
+                <Heart
+                  size={16}
+                  fill="#FF2F40"
+                  color={"#FF2F40"}
+                  strokeWidth={2}
                 />
-              );
-            })}
-          </View>
-        )}
+              ) : (
+                <Heart size={16} color="#000" strokeWidth={2} />
+              )}
+              <RgText style={[styles.post_statsItemText]}>
+                {millify(likesCount, {
+                  precision: 2,
+                  lowercase: true,
+                })}
+              </RgText>
+            </TouchableOpacity>
 
-        <View style={[styles.post_actions]}>
-          <View style={[styles.post_action]}>
-            {/* <Share size={16} color="#000" strokeWidth={2} /> */}
-            <Gift size={16} color="#000" strokeWidth={2} />
+            {/* Comments */}
+            <TouchableOpacity
+              onPress={() => {
+                openPostIntractionsModal({
+                  type: "comments",
+                  data: {
+                    postId: post?.id || "",
+                    comments: post?.comments,
+                  },
+                });
+              }}
+              style={[styles.post_statsItem]}
+            >
+              <MessageCircle size={15} color="#000" strokeWidth={2} />
+              <RgText style={[styles.post_statsItemText]}>
+                {millify(post?.comments_count ?? 0, {
+                  precision: 2,
+                  lowercase: true,
+                })}
+              </RgText>
+            </TouchableOpacity>
+          </View>
+
+          {/* Ellipses indicating current media item */}
+          {post?.media?.length > 1 && false && (
+            <View style={[styles.post_mediaDots]}>
+              {[1, 2, 3]?.map((_, index) => {
+                const dotWidth = scrollX.interpolate({
+                  inputRange: [
+                    (index - 1) * Layout.window.width,
+                    index * Layout.window.width,
+                    (index + 1) * Layout.window.width,
+                  ],
+                  outputRange: [6, 12, 6],
+                  extrapolate: "clamp",
+                });
+
+                const backgroundColor = scrollX.interpolate({
+                  inputRange: [
+                    (index - 1) * Layout.window.width,
+                    index * Layout.window.width,
+                    (index + 1) * Layout.window.width,
+                  ],
+                  outputRange: ["#ddd", primaryColor, "#ddd"],
+                  extrapolate: "clamp",
+                });
+
+                return (
+                  <Animated.View
+                    key={index}
+                    style={[
+                      styles.post_mediaDot,
+                      {
+                        width: dotWidth,
+                        backgroundColor:
+                          index === currentIndex ? primaryColor : "#ddd",
+                      },
+                    ]}
+                  />
+                );
+              })}
+            </View>
+          )}
+
+          <View style={[styles.post_actions]}>
+            <View style={[styles.post_action]}>
+              {/* <Share size={16} color="#000" strokeWidth={2} /> */}
+              <Gift size={16} color="#000" strokeWidth={2} />
+            </View>
           </View>
         </View>
-      </View>
+      )}
     </View>
   );
 };

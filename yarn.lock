@@ -7366,6 +7366,11 @@ react-native-collapsible-tab-view@^6.2.1:
   dependencies:
     use-deep-compare "^1.1.0"
 
+react-native-compressor@^1.8.12:
+  version "1.8.12"
+  resolved "https://registry.yarnpkg.com/react-native-compressor/-/react-native-compressor-1.8.12.tgz#6e50247d3d2a12845eb27cfa983ef4c56a00738f"
+  integrity sha512-KyS9hk2LnWiuZyqQcUrQv38kW0R9C8B9FLTc4ML3S9MglXhzbarfBMECxc+23GR7r/NkImMzQc0j9mgIDtRp9A==
+
 react-native-gesture-handler@~2.12.0:
   version "2.12.1"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.12.1.tgz#f11a99fb95169810c6886fad5efa01a17fd81660"

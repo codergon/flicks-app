@@ -1,5 +1,4 @@
 import React from "react";
-import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { ICreator } from "typings/post";
 import TimeAgo from "components/_common/TimeAgo";
@@ -23,7 +22,7 @@ const PostCreator = ({ data, size, badge }: CreatorProps) => {
       activeOpacity={0.8}
       style={[styles.creator]}
       onPress={() => {
-        router.push(`/${segment}/2345` as any);
+        router.push(`/${segment}/${data?.address}` as any);
       }}
     >
       <View

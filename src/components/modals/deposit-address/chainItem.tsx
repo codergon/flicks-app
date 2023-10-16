@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { padding } from "helpers/styles";
 import { Copy } from "lucide-react-native";
 import { Check } from "lucide-react-native";
-// import * as Clipboard from "expo-clipboard";
+import * as Clipboard from "expo-clipboard";
 import shortenAddress from "utils/shortenAddress";
 import { RgText, Text } from "components/_ui/typography";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -18,7 +18,7 @@ const ChainItem = ({ chain, isPreferred }: ChainItemProps) => {
 
   const copyAddress = async (address: string) => {
     setCopied(true);
-    // await Clipboard.setStringAsync(address);
+    await Clipboard.setStringAsync(address);
 
     setTimeout(() => {
       setCopied(false);

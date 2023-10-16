@@ -43,7 +43,7 @@ const AccountMediaItem = ({ item }: ContentProps) => {
         transition={300}
         contentFit="cover"
         style={[styles.mediaImage]}
-        source={require("assets/images/mock/3.png")}
+        source={require("assets/images/mock/1.png")}
       />
     </TouchableOpacity>
   );

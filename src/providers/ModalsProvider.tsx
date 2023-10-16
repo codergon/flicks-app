@@ -16,6 +16,7 @@ const ModalsProvider = ({ children }: ModalsProviderProps) => {
   const updateAccountRef = useRef<BottomSheet>(null);
   const depositAddressesRef = useRef<BottomSheet>(null);
   const postInteractionsRef = useRef<BottomSheet>(null);
+  const withdrawalRef = useRef<BottomSheet>(null);
 
   const [postInteractions, setPostInteractions] = useState<{
     postId?: string;
@@ -57,6 +58,14 @@ const ModalsProvider = ({ children }: ModalsProviderProps) => {
   };
   const closeDepositAddressesModal = () => {
     depositAddressesRef.current?.close();
+  };
+
+  // show withdrawal modal
+  const openWithdrawalModal = () => {
+    withdrawalRef.current?.expand();
+  };
+  const closeWithdrawalModal = () => {
+    withdrawalRef.current?.close();
   };
 
   // handle commenting on posts
@@ -127,6 +136,10 @@ const ModalsProvider = ({ children }: ModalsProviderProps) => {
         depositAddressesRef,
         openDepositAddressesModal,
         closeDepositAddressesModal,
+
+        withdrawalRef,
+        openWithdrawalModal,
+        closeWithdrawalModal,
       }}
     >
       {children}
@@ -149,6 +162,10 @@ type ModalsProviderProps = {
 };
 
 interface ModalsContext {
+  withdrawalRef: React.MutableRefObject<BottomSheet | null>;
+  openWithdrawalModal: () => void;
+  closeWithdrawalModal: () => void;
+
   postInteractions: {
     comments: IPostComment[];
   } | null;
