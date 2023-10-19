@@ -55,7 +55,14 @@ const ProfileMediaItem = ({ item }: ContentProps) => {
           useNativeControls={false}
           source={{ uri: item?.url }}
           resizeMode={ResizeMode.COVER}
-        />
+        >
+          <Image
+            transition={300}
+            contentFit="cover"
+            style={[styles.mediaImage]}
+            source={{ blurhash: "LIG+2d-;yDv{P;s+MvVrv0WF+FOt" }}
+          />
+        </Video>
       )}
     </TouchableOpacity>
   );

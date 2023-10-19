@@ -1,12 +1,12 @@
 import { Image } from "expo-image";
 import styles from "./post.styles";
 import { IPostMedia } from "typings/post";
-import { ResizeMode, Video } from "expo-av";
+import { Video, ResizeMode } from "expo-av";
+import triggerAudio from "utils/playSound";
 import { Play } from "phosphor-react-native";
-import { Blurhash } from "react-native-blurhash";
 import { RgText } from "components/_ui/typography";
 import { Fragment, useRef, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 interface PostMediaProps {
   index: number;
@@ -31,24 +31,32 @@ const PostMedia = ({ media, index }: PostMediaProps) => {
         <Video
           isLooping
           ref={video}
+          volume={1}
           style={styles.mediaVideo}
           useNativeControls={false}
           source={{ uri: media?.url }}
           resizeMode={ResizeMode.COVER}
           onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-        />
+        >
+          <Image
+            transition={300}
+            contentFit="cover"
+            style={[styles.mediaImage]}
+            source={{ blurhash: "LIG+2d-;yDv{P;s+MvVrv0WF+FOt" }}
+          />
+        </Video>
       )}
 
-      {media?.media_type === "video" && video?.current && (
+      {media?.media_type === "video" && video?.current && status.isLoaded && (
         <TouchableOpacity
           style={[styles.videoOverlay]}
           onPress={() =>
             status.isPlaying
               ? video?.current?.pauseAsync()
-              : video?.current?.playAsync()
+              : triggerAudio(video)
           }
         >
-          {!status?.isPlaying && (
+          {!status?.isPlaying ? (
             <Fragment>
               <View style={[styles.playIcon]}>
                 <Play size={20} color="#fff" weight="fill" />
@@ -82,6 +90,14 @@ const PostMedia = ({ media, index }: PostMediaProps) => {
                 </RgText>
               </View>
             </Fragment>
+          ) : (
+            <>
+              {status?.isBuffering && (
+                <View style={[styles.playIcon]}>
+                  <ActivityIndicator size="small" color="#fff" />
+                </View>
+              )}
+            </>
           )}
         </TouchableOpacity>
       )}

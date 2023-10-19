@@ -21,7 +21,6 @@ export const styles = StyleSheet.create({
     gap: 14,
     width: "100%",
     paddingVertical: 16,
-    // borderBottomWidth: 1,
     flexDirection: "column",
   },
   keyword: {

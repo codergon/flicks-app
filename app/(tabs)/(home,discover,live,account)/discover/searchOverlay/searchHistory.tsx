@@ -227,23 +227,18 @@ const SearchHistory = ({ setSearch }: SearchHistoryProps) => {
           />
         ) : searchQuery?.data?.length ?? 0 > 0 ? (
           <>
-            {searchQuery?.data?.map((item, index) => {
-              return (
-                <Fragment key={index}>
-                  <SearchedCreator key={item?.id} item={item} />
-                </Fragment>
-              );
-            })}
+            <View style={[styles.searched_keywords]}>
+              {searchQuery?.data?.map((item, index) => {
+                return (
+                  <Fragment key={index}>
+                    <SearchedCreator key={item?.id} item={item} />
+                  </Fragment>
+                );
+              })}
+            </View>
           </>
         ) : (
-          <View
-            style={[
-              styles.searched_keywords,
-              {
-                borderColor: "#eee",
-              },
-            ]}
-          >
+          <View style={[styles.searched_keywords]}>
             {(recentSearches?.length ?? 0) > 0 && <Text>Recent</Text>}
             {recentSearches?.map((item, index) => {
               return (

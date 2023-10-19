@@ -1,7 +1,7 @@
 import Colors from "constants/Colors";
 import { Redirect, Tabs } from "expo-router";
 import Icons from "components/_common/Icons";
-import { Text } from "components/_ui/typography";
+import Loader from "components/_common/Loader";
 import useColorScheme from "hooks/useColorScheme";
 import { useModals } from "providers/ModalsProvider";
 import { TouchableOpacity, View } from "react-native";
@@ -42,11 +42,7 @@ export default function TabLayout() {
   const { userData, isAuthenticating, userSignature } = useAccount();
 
   if (isAuthenticating) {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Flicks</Text>
-      </View>
-    );
+    return <Loader />;
   }
 
   if (!userData) {

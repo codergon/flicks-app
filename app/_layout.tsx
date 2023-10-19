@@ -3,21 +3,14 @@ import { useFonts } from "expo-font";
 import { Fragment, useEffect } from "react";
 import { Providers } from "providers/Providers";
 import { SplashScreen, Stack } from "expo-router";
-import useColorScheme from "hooks/useColorScheme";
+import AppToast from "components/_common/appToast";
 
 // Modals
 import EditProfileModal from "components/modals/edit-profile";
-import CreateContentModal from "components/modals/create-content";
-import PostInteractionsModal from "components/modals/post-interactions";
-
-import Toast, {
-  BaseToast,
-  ErrorToast,
-  BaseToastProps,
-} from "react-native-toast-message";
-import Layout from "constants/Layout";
-import DepositAddressesModal from "components/modals/deposit-address";
 import WithdrawalModal from "components/modals/withdraw-popup";
+import CreateContentModal from "components/modals/create-content";
+import DepositAddressesModal from "components/modals/deposit-address";
+import PostInteractionsModal from "components/modals/post-interactions";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -55,12 +48,6 @@ export const unstable_settings = {
 };
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-  const toastText = colorScheme === "dark" ? "#fff" : "#000";
-  const toastText2 = colorScheme === "dark" ? "#999" : "#777";
-  const toastBorder = colorScheme === "dark" ? "#333" : "#ccc";
-  const toastBackground = colorScheme === "dark" ? "#1b1b1b" : "#fff";
-
   return (
     <Providers>
       <Fragment>
@@ -72,6 +59,14 @@ function RootLayoutNav() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
           <Stack.Screen
+            name="shareQR"
+            options={{ presentation: "modal", animation: "slide_from_bottom" }}
+          />
+          <Stack.Screen
+            name="scanQR"
+            options={{ presentation: "modal", animation: "slide_from_bottom" }}
+          />
+          <Stack.Screen
             name="upload"
             options={{
               gestureDirection: "vertical",
@@ -81,90 +76,13 @@ function RootLayoutNav() {
           />
         </Stack>
 
+        <WithdrawalModal />
+        <EditProfileModal />
         <CreateContentModal />
         <PostInteractionsModal />
-        <EditProfileModal />
         <DepositAddressesModal />
-        <WithdrawalModal />
 
-        <Toast
-          config={{
-            success: (props: BaseToastProps) => (
-              <BaseToast
-                {...props}
-                {...props}
-                style={{
-                  height: "auto",
-                  borderWidth: 1,
-                  paddingLeft: 0,
-                  borderRadius: 10,
-                  paddingVertical: 0,
-                  borderColor: toastBorder,
-                  borderLeftColor: "#419B45",
-                  width: Layout.window.width - 32,
-                  backgroundColor: toastBackground,
-                }}
-                renderLeadingIcon={() => null}
-                contentContainerStyle={{
-                  gap: 2,
-                  minHeight: 50,
-                  paddingVertical: 10,
-                  paddingHorizontal: 14,
-                }}
-                text1Style={{
-                  fontSize: 14,
-                  color: toastText,
-                  fontFamily: "AcidGrotesk-Medium",
-                }}
-                text2Props={{
-                  numberOfLines: 2,
-                }}
-                text2Style={{
-                  fontSize: 12,
-                  color: toastText2,
-                  fontFamily: "DMSans-Medium",
-                }}
-              />
-            ),
-
-            error: (props: BaseToastProps) => (
-              <ErrorToast
-                {...props}
-                style={{
-                  height: "auto",
-                  borderWidth: 1,
-                  paddingLeft: 0,
-                  borderRadius: 10,
-                  paddingVertical: 0,
-                  borderColor: toastBorder,
-                  borderLeftColor: "#F83131",
-                  width: Layout.window.width - 32,
-                  backgroundColor: toastBackground,
-                }}
-                renderLeadingIcon={() => null}
-                contentContainerStyle={{
-                  gap: 2,
-                  minHeight: 50,
-                  paddingVertical: 10,
-                  paddingHorizontal: 14,
-                }}
-                text1Style={{
-                  fontSize: 14,
-                  color: toastText,
-                  fontFamily: "AcidGrotesk-Medium",
-                }}
-                text2Props={{
-                  numberOfLines: 2,
-                }}
-                text2Style={{
-                  fontSize: 12,
-                  color: toastText2,
-                  fontFamily: "DMSans-Medium",
-                }}
-              />
-            ),
-          }}
-        />
+        <AppToast />
       </Fragment>
     </Providers>
   );

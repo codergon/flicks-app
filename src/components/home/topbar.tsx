@@ -1,9 +1,11 @@
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { Text } from "components/_ui/typography";
 import { ChevronDown } from "lucide-react-native";
 import { Bell, QrCode } from "phosphor-react-native";
 import { useAccount } from "providers/AccountProvider";
+import { TouchableOpacity } from "components/_ui/themed";
 
 import {
   Menu,
@@ -25,8 +27,14 @@ const Topbar = () => {
         },
       ]}
     >
-      <QrCode size={24} color="#000" />
-
+      <TouchableOpacity
+        style={[styles.actionBtn]}
+        onPress={() => {
+          router.push("/scanQR/");
+        }}
+      >
+        <QrCode size={24} color="#000" />
+      </TouchableOpacity>
       <Menu
         renderer={renderers.Popover}
         rendererProps={{
@@ -101,7 +109,9 @@ const Topbar = () => {
         </MenuOptions>
       </Menu>
 
-      <Bell size={20} color="#000" />
+      <TouchableOpacity style={[styles.actionBtn]} onPress={() => {}}>
+        <Bell size={20} color="#000" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -110,12 +120,12 @@ export default Topbar;
 
 const styles = StyleSheet.create({
   topbar: {
-    paddingTop: 10,
-    paddingBottom: 16,
+    paddingTop: 4,
+    paddingBottom: 10,
     borderBottomWidth: 1,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     justifyContent: "space-between",
   },
 
@@ -132,5 +142,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     backgroundColor: "#ddd",
+  },
+
+  actionBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 36,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

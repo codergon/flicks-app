@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Image } from "expo-image";
 import { padding } from "helpers/styles";
-import { Copy } from "lucide-react-native";
-import { Check } from "lucide-react-native";
-import * as Clipboard from "expo-clipboard";
+import useClipboard from "hooks/useClipboard";
+import { Copy, Check } from "lucide-react-native";
 import shortenAddress from "utils/shortenAddress";
 import { RgText, Text } from "components/_ui/typography";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -14,16 +13,7 @@ interface ChainItemProps {
 }
 
 const ChainItem = ({ chain, isPreferred }: ChainItemProps) => {
-  const [copied, setCopied] = useState(false);
-
-  const copyAddress = async (address: string) => {
-    setCopied(true);
-    await Clipboard.setStringAsync(address);
-
-    setTimeout(() => {
-      setCopied(false);
-    }, 1300);
-  };
+  const [copied = false, copyToClipboard] = useClipboard();
 
   return (
     <View
@@ -60,7 +50,7 @@ const ChainItem = ({ chain, isPreferred }: ChainItemProps) => {
 
       <TouchableOpacity
         onPress={() => {
-          copyAddress(chain?.address);
+          if (chain?.address) copyToClipboard(chain?.address);
         }}
         style={[
           styles.copyBtn,

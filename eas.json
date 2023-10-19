@@ -9,10 +9,14 @@
       "distribution": "internal"
     },
     "preview": {
+      "node": "20.8.0",
       "distribution": "internal"
     },
     "production": {
-      "node": "20.8.0"
+      "node": "20.8.0",
+      "android": {
+        "buildType": "apk"
+      }
     }
   },
   "submit": {

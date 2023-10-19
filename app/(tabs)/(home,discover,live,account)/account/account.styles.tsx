@@ -63,12 +63,15 @@ const styles = StyleSheet.create({
   },
 
   actionBtns: {
+    gap: 6,
     flexDirection: "row",
     alignItems: "center",
   },
+
   actionBtn: {
     width: 36,
     height: 36,
+    borderRadius: 36,
     alignItems: "center",
     justifyContent: "center",
   },

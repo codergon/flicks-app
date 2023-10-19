@@ -1,9 +1,11 @@
 import React from "react";
 import { Image } from "expo-image";
 import { ICreator } from "typings/post";
+import * as Haptics from "expo-haptics";
 import TimeAgo from "components/_common/TimeAgo";
 import { Text } from "components/_ui/typography";
 import { router, useSegments } from "expo-router";
+import { useAccount } from "providers/AccountProvider";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface CreatorProps {
@@ -15,6 +17,7 @@ interface CreatorProps {
 }
 
 const PostCreator = ({ data, size, badge }: CreatorProps) => {
+  const { userData } = useAccount();
   const [, segment] = useSegments();
 
   return (
@@ -22,7 +25,12 @@ const PostCreator = ({ data, size, badge }: CreatorProps) => {
       activeOpacity={0.8}
       style={[styles.creator]}
       onPress={() => {
-        router.push(`/${segment}/${data?.address}` as any);
+        if (segment === "(account)" && data?.address === userData?.address) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          return;
+        } else {
+          router.push(`/${segment}/${data?.address}` as any);
+        }
       }}
     >
       <View

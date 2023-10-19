@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#080808"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#111"
       },
       "permissions": ["android.permission.RECORD_AUDIO"],
       "package": "com.alphatron.Flicks"
@@ -39,6 +39,12 @@
           "photosPermission": "$(PRODUCT_NAME) would like to access your photos to upload media",
           "cameraPermission": "$(PRODUCT_NAME) would like to access your camera to take a photo",
           "microphonePermission": "$(PRODUCT_NAME) would like to access your microphone to record audio"
+        }
+      ],
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "$(PRODUCT_NAME) would like to access your camera to scan barcodes"
         }
       ]
     ],

@@ -1,7 +1,8 @@
 import { Image } from "expo-image";
 import Layout from "constants/Layout";
-import { useRef, useState } from "react";
 import { padding } from "helpers/styles";
+import { useRef, useState } from "react";
+import triggerAudio from "utils/playSound";
 import { ResizeMode, Video } from "expo-av";
 import { Play } from "phosphor-react-native";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -21,6 +22,7 @@ const MediaItemView = ({ media }: MediaItemViewProps) => {
           contentFit="contain"
           style={[styles.mediaImage]}
           source={{ uri: media?.url }}
+          placeholder={"LIG+2d-;yDv{P;s+MvVrv0WF+FOt"}
         />
       ) : (
         <>
@@ -32,7 +34,14 @@ const MediaItemView = ({ media }: MediaItemViewProps) => {
             source={{ uri: media?.url }}
             resizeMode={ResizeMode.COVER}
             onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-          />
+          >
+            <Image
+              transition={300}
+              contentFit="cover"
+              style={[styles.mediaImage]}
+              source={{ blurhash: "LIG+2d-;yDv{P;s+MvVrv0WF+FOt" }}
+            />
+          </Video>
 
           {video?.current && (
             <TouchableOpacity
@@ -40,7 +49,7 @@ const MediaItemView = ({ media }: MediaItemViewProps) => {
               onPress={() =>
                 status.isPlaying
                   ? video?.current?.pauseAsync()
-                  : video?.current?.playAsync()
+                  : triggerAudio(video)
               }
             >
               {!status?.isPlaying && (

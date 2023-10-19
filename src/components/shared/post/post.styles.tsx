@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
     flexDirection: "row",
-    ...padding(9, 16, 13, 8),
+    ...padding(9, 12, 13, 8),
     justifyContent: "center",
   },
   // Post stats

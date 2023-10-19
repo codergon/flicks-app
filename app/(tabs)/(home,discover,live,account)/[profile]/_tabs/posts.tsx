@@ -1,15 +1,14 @@
+import axios from "axios";
 import { IPost } from "typings/post";
 import Post from "components/shared/post";
-import { useApp } from "providers/AppProvider";
 import { useCallback, useState } from "react";
-import { RefreshControl } from "react-native";
 import { StyleSheet, View } from "react-native";
+import { useQuery } from "@tanstack/react-query";
 import EmptyState from "components/shared/emptyState";
+import { useAccount } from "providers/AccountProvider";
 import { Tabs } from "react-native-collapsible-tab-view";
 import { GalleryVerticalEnd } from "lucide-react-native";
-import { useAccount } from "providers/AccountProvider";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import RefreshControl from "components/_common/RefreshControl";
 
 const ProfilePostsTab = ({ profile = "" }) => {
   const { userSignature } = useAccount();

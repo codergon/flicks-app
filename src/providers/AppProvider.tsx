@@ -1,56 +1,144 @@
 import axios from "axios";
-import { router, useSegments } from "expo-router";
+import { nanoid } from "nanoid";
+import { router } from "expo-router";
+import Constants from "expo-constants";
+import { Platform } from "react-native";
 import { useAccount } from "./AccountProvider";
+import Toast from "react-native-toast-message";
 import * as ImagePicker from "expo-image-picker";
 import { PresignedUrlResponse } from "typings/api";
+import * as Notifications from "expo-notifications";
+import ImageCompressor from "react-native-compressor";
 import * as VideoThumbnails from "expo-video-thumbnails";
-import { useState, ReactNode, useContext, createContext } from "react";
-import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
-import Toast from "react-native-toast-message";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLargeStorageState } from "hooks/useLargeStorageState";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
 import {
-  RecentSearchCreator,
+  useRef,
+  useState,
+  useEffect,
+  ReactNode,
+  useContext,
+  createContext,
+} from "react";
+import {
   RecentSearch,
   RecentSearches,
+  RecentSearchCreator,
 } from "typings/common";
-import { nanoid } from "nanoid";
 
-type AppProviderProps = {
-  children: ReactNode;
-};
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
-export type MediaType = ImagePicker.ImagePickerAsset & {
-  thumbnail?: string;
-  edits?: string[];
-};
+export async function schedulePushNotification({
+  title,
+  body,
+  data,
+}: Notifications.NotificationContentInput) {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title,
+      body,
+      data,
+      // data: { data: "notification data" },
+    },
+    trigger: { seconds: 2 },
+  });
+}
 
-export function useApp() {
-  const value = useContext(AppContext);
-  if (process.env.NODE_ENV !== "production") {
-    if (!value) {
-      throw new Error("useApp must be wrapped in a <AppProvider />");
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  try {
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
     }
+
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+
+    token = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig?.extra?.eas.projectId,
+      })
+    ).data;
+  } catch (error) {
+    console.log(error);
   }
-  return value;
+
+  return token;
 }
 
 const AppProvider = ({ children }: AppProviderProps) => {
   const insets = useSafeAreaInsets();
   const { userSignature } = useAccount();
 
+  // State
   const [uploading, setUploading] = useState(false);
+  const [currentUpload, setCurrentUpload] = useState<{
+    price?: number;
+    caption: string;
+    contentType: "free" | "paid";
+  } | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<string[]>([]);
+  const [uploadError, setUploadError] = useState<any>(null);
+
   const [selectedMedia, setSelectedMedia] = useState<MediaType[]>([]);
 
   const [[isLoadingSearches, recentSearches], setRecentSearches] =
     useLargeStorageState<RecentSearches>("recentSearches");
 
-  const [uploadStatus, setUploadStatus] = useState<string[]>([
-    "Uploading media...",
-    "Creating content...",
-    "Done!",
-  ]);
+  // push notifications
+  const responseListener = useRef<Notifications.Subscription>();
+  const notificationListener = useRef<Notifications.Subscription>();
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+
+  // register for push notifications
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token || "")
+    );
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification as any);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current as Notifications.Subscription
+      );
+      Notifications.removeNotificationSubscription(
+        responseListener.current as any
+      );
+    };
+  }, []);
 
   // handle searching for creators
   const [searchQuery, setSearchQuery] = useState<ISearchQuery>({
@@ -58,6 +146,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
     loading: false,
     error: null,
   });
+
   const handleSearch = async (search: string) => {
     setSearchQuery((prev) => ({ ...prev, loading: true, error: null }));
 
@@ -128,40 +217,6 @@ const AppProvider = ({ children }: AppProviderProps) => {
       enabled: !!userSignature?.signature,
     }
   );
-
-  // Start content upload
-  const startContentUpload = async () => {
-    // Prompt user to select media
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      // allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-      orderedSelection: true,
-      presentationStyle: ImagePicker.UIImagePickerPresentationStyle.FULL_SCREEN,
-      allowsMultipleSelection: true,
-    });
-
-    if (!result.canceled && result.assets.length > 0) {
-      // for each of the selected media, create a thumbnail for the videos
-      const assets = [];
-      for (const asset of result.assets) {
-        if (asset.type === "video") {
-          try {
-            const { uri } = await VideoThumbnails.getThumbnailAsync(asset.uri);
-            assets.push({ ...asset, thumbnail: uri });
-          } catch (error) {
-            assets.push(asset);
-          }
-        } else {
-          assets.push(asset);
-        }
-      }
-
-      setSelectedMedia(assets);
-      router.push("/upload");
-    }
-  };
 
   // Remove media
   const removeMedia = (assetId?: string) => {
@@ -248,18 +303,103 @@ const AppProvider = ({ children }: AppProviderProps) => {
     }
   };
 
+  // Start content upload
+  const startContentUpload = async () => {
+    if (uploading) {
+      Toast.show({
+        type: "warning",
+        topOffset: insets.top + 10,
+        text1: "Upload in progress",
+        text2:
+          "Please wait for the current upload to complete before starting a new one",
+      });
+
+      return;
+    }
+
+    // Prompt user to select media
+    let result = await ImagePicker.launchImageLibraryAsync({
+      quality: 1,
+      aspect: [4, 3],
+      selectionLimit: 4,
+      orderedSelection: true,
+      allowsMultipleSelection: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      presentationStyle: ImagePicker.UIImagePickerPresentationStyle.FULL_SCREEN,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      // for each of the selected media, create a thumbnail for the videos
+      const assets = [];
+      for (const asset of result.assets) {
+        if (asset.type === "video") {
+          try {
+            const { uri } = await VideoThumbnails.getThumbnailAsync(asset.uri);
+            assets.push({ ...asset, thumbnail: uri });
+          } catch (error) {
+            assets.push(asset);
+          }
+        } else {
+          assets.push(asset);
+        }
+      }
+
+      setSelectedMedia(assets);
+      router.push("/upload");
+    }
+  };
+
+  // Upload content
   const uploadContent = async (
     caption: string,
     contentType: "free" | "paid",
-    price: number
+    price: number,
+    isRetry: boolean = false
   ) => {
     try {
       setUploading(true);
+      setUploadError(null);
+
+      setCurrentUpload({
+        contentType,
+        caption: caption ?? "✨",
+        ...(contentType === "paid" && { price }),
+      });
+      if (!isRetry) router.replace("/(tabs)/(account)/account");
+
+      setUploadStatus(["Compresing media..."]);
+
+      // compress media
+      const compressedMedia = await Promise.all(
+        selectedMedia.map(async (item) => {
+          if (
+            (item?.type === "image" &&
+              (item?.fileSize || 0) < 1024 * 1024 * 4.5) ||
+            (item?.type === "video" &&
+              (item?.fileSize || 0) < 1024 * 1024 * 188)
+          ) {
+            return item;
+          } else {
+            const result = await ImageCompressor?.[
+              item?.type === "video" ? "Video" : "Image"
+            ].compress(item?.uri);
+            const size = await ImageCompressor.getFileSize(result);
+            return {
+              ...item,
+              uri: result,
+              fileSize: Number(size),
+            };
+          }
+        })
+      );
+
+      setUploadStatus((prev) => [...prev, "Getting upload urls..."]);
+
       // Get presigned urls
       const { data: responseData } = await axios.post(
         "/contents/get-upload-urls",
         {
-          files: selectedMedia.map((item) => ({
+          files: compressedMedia.map((item) => ({
             file_type: item.type,
             file_name: item.fileName,
           })),
@@ -273,8 +413,10 @@ const AppProvider = ({ children }: AppProviderProps) => {
 
       const { data }: { data: PresignedUrlResponse } = responseData;
 
+      setUploadStatus((prev) => [...prev, "Uploading media..."]);
+
       // Upload media to presigned urls
-      const uploadPromises = selectedMedia.map(async (item, index) => {
+      const uploadPromises = compressedMedia.map(async (item, index) => {
         const { url, fields } = data?.[item.fileName ?? ""];
         const formData = new FormData();
         Object.entries(fields).forEach(([key, value]) => {
@@ -294,14 +436,13 @@ const AppProvider = ({ children }: AppProviderProps) => {
 
       await Promise.all(uploadPromises);
 
-      const blurhash = "LKN]Rv%2Tw=w]~RBVZRi};RPxuwH";
+      setUploadStatus((prev) => [...prev, "Uploading content..."]);
 
       const contentData = {
         ...(contentType === "paid" && { price }),
         caption: caption ?? "✨",
         content_type: contentType,
-        media: selectedMedia.map((item) => ({
-          blur_hash: blurhash,
+        media: compressedMedia.map((item) => ({
           media_type: item.type,
           s3_key: data?.[item.fileName ?? ""]?.fields?.key,
         })),
@@ -314,13 +455,22 @@ const AppProvider = ({ children }: AppProviderProps) => {
         },
       });
 
+      setUploadStatus((prev) => [...prev, "Upload complete! Refreshing..."]);
+
       // refetch user data
       await usersPostQuery.refetch();
 
-      // navigate to home
-      router.replace("/(tabs)/(account)/account");
+      await schedulePushNotification({
+        title: "Upload complete!",
+        body: "Your content is now live",
+      });
+
+      // reset state
+      setSelectedMedia([]);
+      setCurrentUpload(null);
     } catch (e: any) {
       console.log(e?.response?.data);
+      setUploadError(e?.response?.data);
       Toast.show({
         type: "error",
         topOffset: insets.top + 10,
@@ -330,6 +480,14 @@ const AppProvider = ({ children }: AppProviderProps) => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const cancelUpload = () => {
+    setUploadError(null);
+    setSelectedMedia([]);
+    setCurrentUpload(null);
+    setUploading(false);
+    setUploadStatus([]);
   };
 
   // handle liking and unliking of posts
@@ -381,13 +539,17 @@ const AppProvider = ({ children }: AppProviderProps) => {
   return (
     <AppContext.Provider
       value={{
-        uploading,
-        uploadContent,
-
         handleLike,
         handleComment,
 
         usersPostQuery,
+
+        uploading,
+        uploadStatus,
+        uploadContent,
+        currentUpload,
+        uploadError,
+        cancelUpload,
 
         editMedia,
         removeMedia,
@@ -422,6 +584,15 @@ interface AppContext {
     action: "add" | "delete"
   ) => void;
 
+  uploadError: any;
+  cancelUpload: () => void;
+  uploadStatus: string[];
+  currentUpload: {
+    price?: number;
+    caption: string;
+    contentType: "free" | "paid";
+  } | null;
+
   searchQuery: {
     data: RecentSearchCreator[] | null;
     loading: boolean;
@@ -435,7 +606,8 @@ interface AppContext {
   uploadContent: (
     caption: string,
     contentType: "free" | "paid",
-    price: number
+    price: number,
+    isRetry?: boolean
   ) => Promise<void>;
   removeMedia: (assetId?: string) => void;
   startContentUpload: () => Promise<void>;
@@ -443,6 +615,25 @@ interface AppContext {
   editMedia: (action: string, assetId: string) => Promise<void>;
   handleComment: (postId: string, comment: string) => Promise<void>;
   handleLike: (postId: string, action: "like" | "unlike") => Promise<void>;
+}
+
+type AppProviderProps = {
+  children: ReactNode;
+};
+
+export type MediaType = ImagePicker.ImagePickerAsset & {
+  thumbnail?: string;
+  edits?: string[];
+};
+
+export function useApp() {
+  const value = useContext(AppContext);
+  if (process.env.NODE_ENV !== "production") {
+    if (!value) {
+      throw new Error("useApp must be wrapped in a <AppProvider />");
+    }
+  }
+  return value;
 }
 
 const AppContext = createContext({} as AppContext);

@@ -1,38 +1,41 @@
 import { Image } from "expo-image";
 import styles from "./account.styles";
 import { padding } from "helpers/styles";
-import { Copy, RefreshCcw } from "lucide-react-native";
-import { Pencil } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { useFocusEffect } from "expo-router";
 import { primaryColor } from "constants/Colors";
+import { RefreshCcw } from "lucide-react-native";
+import { Pencil, Share } from "lucide-react-native";
+import { router, useFocusEffect } from "expo-router";
 import { useModals } from "providers/ModalsProvider";
 import { RgText, Text } from "components/_ui/typography";
-import { View, StatusBar, TouchableOpacity } from "react-native";
+import { useNetInfo } from "@react-native-community/netinfo";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs, MaterialTabBar } from "react-native-collapsible-tab-view";
+import { EyeSlash, PaperPlane, ArrowFatLineDown } from "phosphor-react-native";
 import {
-  EyeSlash,
-  PaperPlane,
-  ArrowFatLineDown,
-  ArrowCounterClockwise,
-} from "phosphor-react-native";
+  View,
+  StatusBar,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 
 import AccountPostsTab from "./_tabs/posts";
 import AccountMediaTab from "./_tabs/gallery";
 import AccountWishlist from "./_tabs/wishlist";
-import shortenAddress from "utils/shortenAddress";
+import AccountTransactons from "./_tabs/transactions";
 import AccountUpcomingStreams from "./_tabs/upcoming";
 import { useAccount } from "providers/AccountProvider";
-import AccountTransactons from "./_tabs/AccountTransactions";
+import AccountHeaderBtns from "components/account/header";
 
 const UserAccountHeader = () => {
-  const { userData, fetchUserData } = useAccount();
+  const netInfo = useNetInfo();
   const insets = useSafeAreaInsets();
+  const { userData, fetchUserData, isRefetchingUser } = useAccount();
   const [hideBalance, setHideBalance] = useState(false);
+
   const {
-    openUpdateAccountModal,
     openWithdrawalModal,
+    openUpdateAccountModal,
     openDepositAddressesModal,
   } = useModals();
 
@@ -47,6 +50,7 @@ const UserAccountHeader = () => {
       ]}
     >
       {/* <AccountHeaderBtns /> */}
+
       <View
         pointerEvents="none"
         style={[
@@ -73,6 +77,7 @@ const UserAccountHeader = () => {
               borderWidth: 3,
               marginTop: -14,
               borderColor: "#fff",
+              position: "relative",
             },
           ]}
         >
@@ -81,6 +86,20 @@ const UserAccountHeader = () => {
             contentFit="cover"
             style={[styles.avatar_image]}
             source={{ uri: userData?.image_url }}
+          />
+
+          <View
+            style={{
+              bottom: 1,
+              right: 2,
+              width: 14,
+              height: 14,
+              borderWidth: 2,
+              borderRadius: 10,
+              borderColor: "#eee",
+              position: "absolute",
+              backgroundColor: netInfo?.isConnected ? "#28a745" : "#aaa",
+            }}
           />
         </View>
 
@@ -96,23 +115,6 @@ const UserAccountHeader = () => {
               <Text style={[styles.creatorInfo__name]}>
                 {userData?.moniker}
               </Text>
-
-              <RgText style={[styles.creatorInfo__desc, { color: "#676C75" }]}>
-                {"•  " + shortenAddress(userData?.address || "", 4)}
-              </RgText>
-
-              <TouchableOpacity
-                // style={[styles.followBtn]}
-                onPress={() => {}}
-                activeOpacity={0.8}
-                style={{
-                  ...padding(4, 4),
-                  // backgroundColor: "#eee",
-                  // borderRadius: 4,
-                }}
-              >
-                <Copy size={12} color="#676C75" strokeWidth={3} />
-              </TouchableOpacity>
             </View>
 
             <View
@@ -156,6 +158,14 @@ const UserAccountHeader = () => {
               onPress={openUpdateAccountModal}
             >
               <Pencil size={16} color="#000" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionBtn]}
+              onPress={() => {
+                router.push("/shareQR/");
+              }}
+            >
+              <Share size={16} strokeWidth={2.2} color="#000" />
             </TouchableOpacity>
           </View>
         </View>
@@ -217,12 +227,27 @@ const UserAccountHeader = () => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={{ ...padding(4, 2) }}
+                  style={{ ...padding(4, 4) }}
                   onPressIn={() => {
                     fetchUserData(true);
                   }}
                 >
-                  <RefreshCcw size={15} color="#000" strokeWidth={2.3} />
+                  {!isRefetchingUser ? (
+                    <RefreshCcw size={15} color="#000" strokeWidth={2.3} />
+                  ) : (
+                    <ActivityIndicator
+                      color={"#000"}
+                      size={"small"}
+                      style={{
+                        height: 15,
+                        transform: [
+                          {
+                            scale: 0.7,
+                          },
+                        ],
+                      }}
+                    />
+                  )}
                 </TouchableOpacity>
               </View>
             </View>

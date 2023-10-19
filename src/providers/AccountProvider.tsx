@@ -64,6 +64,7 @@ export default function AccountProvider(props: AccountProviderProps) {
 
   // user data
   const [isFetchingUser, setIsFetchingUser] = useState<boolean>(false);
+  const [isRefetchingUser, setIsRefetchingUser] = useState<boolean>(false);
   const [phantomWalletPublicKey, setPhantomWalletPublicKey] =
     useState<PublicKey>();
   const [[isLoading, userData], setuserData] =
@@ -152,7 +153,12 @@ export default function AccountProvider(props: AccountProviderProps) {
   const fetchUserData = async (isRefetch = false) => {
     if (!userSignature || isCheckingUser) return;
 
-    if (!isRefetch) setIsFetchingUser(true);
+    if (!isRefetch) {
+      setIsFetchingUser(true);
+    } else {
+      setIsRefetchingUser(true);
+    }
+
     try {
       const { data } = await axios.get(
         `/creators/${userSignature?.publicKey}`,
@@ -163,15 +169,14 @@ export default function AccountProvider(props: AccountProviderProps) {
         }
       );
 
-      if (data?.data) {
-        setuserData(data?.data);
-      } else {
-        // setUserSignature(null);
-      }
+      if (data?.data) setuserData(data?.data);
     } catch (error: any) {
       console.log(error?.response?.data);
     } finally {
-      if (!isRefetch) setIsFetchingUser(false);
+      if (!isRefetch) {
+        setIsFetchingUser(false);
+      }
+      setIsRefetchingUser(false);
     }
   };
 
@@ -298,7 +303,7 @@ export default function AccountProvider(props: AccountProviderProps) {
       const params = new URLSearchParams({
         dapp_encryption_public_key: bs58.encode(dappKeyPair.publicKey),
         cluster: "mainnet-beta",
-        app_url: "https://phantom.app",
+        app_url: "https://flicksapp.vercel.app",
         redirect_link: onConnectRedirectLink,
       });
       const url = buildUrl("connect", params);
@@ -320,7 +325,7 @@ export default function AccountProvider(props: AccountProviderProps) {
   const disconnect = async () => {
     setuserData(null);
     setSession(undefined);
-    setUserSignature(null);
+    setUserSignature();
     setPhantomWalletPublicKey(undefined);
     setSharedSecret(undefined);
     setAcctSNS("");
@@ -343,6 +348,7 @@ export default function AccountProvider(props: AccountProviderProps) {
         isCreatingAccount,
 
         fetchUserData,
+        isRefetchingUser,
 
         bio,
         setBio,
@@ -381,6 +387,7 @@ interface AccountContext {
   setUsername: (username: string) => void;
   setUseDomainName: (useDomainName: boolean) => void;
 
+  isRefetchingUser: boolean;
   fetchUserData: (isRefetch?: boolean) => Promise<void>;
 
   acctSNS: string;

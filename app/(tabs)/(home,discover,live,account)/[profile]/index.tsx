@@ -2,34 +2,37 @@ import axios from "axios";
 import { Image } from "expo-image";
 import styles from "./profile.styles";
 import { padding } from "helpers/styles";
-import { Copy, RefreshCcw } from "lucide-react-native";
-import { Pencil } from "lucide-react-native";
+import { Check, Copy } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { primaryColor } from "constants/Colors";
-import { useModals } from "providers/ModalsProvider";
 import { RgText, Text } from "components/_ui/typography";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Tabs, MaterialTabBar } from "react-native-collapsible-tab-view";
 import {
   View,
   StatusBar,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Tabs, MaterialTabBar } from "react-native-collapsible-tab-view";
-import { EyeSlash, PaperPlane, ArrowFatLineDown } from "phosphor-react-native";
 
 import ProfilePostsTab from "./_tabs/posts";
 import ProfileMediaTab from "./_tabs/gallery";
 import ProfileWishlist from "./_tabs/wishlist";
 import ProfileUpcomingStreams from "./_tabs/upcoming";
 
-import shortenAddress from "utils/shortenAddress";
-import { useAccount } from "providers/AccountProvider";
-import { useQuery } from "@tanstack/react-query";
-import ProfileHeaderBtns from "components/profile/header";
+import Layout from "constants/Layout";
 import { Creator } from "typings/user";
+import useClipboard from "hooks/useClipboard";
 import Toast from "react-native-toast-message";
+import { useQuery } from "@tanstack/react-query";
+import Skeleton from "components/_common/Skeleton";
+import shortenAddress from "utils/shortenAddress";
+import { ScrollView } from "components/_ui/themed";
+import { useAccount } from "providers/AccountProvider";
+import ProfileHeaderBtns from "components/profile/header";
+import RefreshControl from "components/_common/RefreshControl";
+import { schedulePushNotification } from "providers/AppProvider";
 
 const UserProfileHeader = ({
   userData,
@@ -41,6 +44,7 @@ const UserProfileHeader = ({
   userData: Creator | null;
 }) => {
   const insets = useSafeAreaInsets();
+  const [copied = false, copyToClipboard] = useClipboard();
   const { userData: currentUser, userSignature } = useAccount();
 
   const [subscribing, setSubscribing] = useState(false);
@@ -60,6 +64,11 @@ const UserProfileHeader = ({
           },
         }
       );
+
+      await schedulePushNotification({
+        title: "Subscription successful ✨",
+        body: `You have successfully subscribed to ${userData?.moniker}`,
+      });
 
       await refetch?.();
     } catch (e: any) {
@@ -87,6 +96,7 @@ const UserProfileHeader = ({
       ]}
     >
       <ProfileHeaderBtns />
+
       <View
         pointerEvents="none"
         style={[
@@ -96,12 +106,21 @@ const UserProfileHeader = ({
           },
         ]}
       >
-        <Image
-          transition={300}
-          contentFit="cover"
-          style={[styles.bannerImg]}
-          source={{ uri: userData?.banner_url }}
-        />
+        <Skeleton
+          height={200}
+          delay={3000}
+          animationSpeed={4000}
+          showContent={!!userData}
+          width={Layout.window.width}
+          style={{ borderRadius: 0 }}
+        >
+          <Image
+            transition={300}
+            contentFit="cover"
+            style={[styles.bannerImg]}
+            source={{ uri: userData?.banner_url }}
+          />
+        </Skeleton>
       </View>
 
       <View style={styles.userDetails}>
@@ -126,68 +145,88 @@ const UserProfileHeader = ({
 
         <View style={[styles.info_actions]}>
           <View style={[styles.creatorInfo]}>
-            <View
-              style={{
-                gap: 5,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Text style={[styles.creatorInfo__name]}>
-                {userData?.moniker}
-              </Text>
-
-              <RgText style={[styles.creatorInfo__desc, { color: "#676C75" }]}>
-                {"•  " + shortenAddress(userData?.address || "", 4)}
-              </RgText>
-
-              <TouchableOpacity
-                // style={[styles.followBtn]}
-                onPress={() => {}}
-                activeOpacity={0.8}
+            <Skeleton showContent={!!userData}>
+              <View
                 style={{
-                  ...padding(4, 4),
-                  // backgroundColor: "#eee",
-                  // borderRadius: 4,
+                  gap: 5,
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
               >
-                <Copy size={12} color="#676C75" strokeWidth={3} />
-              </TouchableOpacity>
-            </View>
+                <Text style={[styles.creatorInfo__name]}>
+                  {userData?.moniker}
+                </Text>
 
-            <View
-              style={{
-                gap: 7,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <RgText style={[styles.creatorInfo__desc, { color: "#676C75" }]}>
-                {/* {shortenAddress(userData?.address || "")} */}
-                {`${
-                  userData?.subscribers_count &&
-                  !isNaN(userData?.subscribers_count) &&
-                  Number(userData?.subscribers_count) > 0
-                    ? userData?.subscribers_count
-                    : 0
-                } subscriber${
-                  (userData?.subscribers_count &&
-                  !isNaN(userData?.subscribers_count) &&
-                  Number(userData?.subscribers_count) > 0
-                    ? userData?.subscribers_count
-                    : 0) > 1
-                    ? "s"
-                    : ""
-                }`}{" "}
-                {`• ${
-                  userData?.contents_count &&
-                  !isNaN(userData?.contents_count) &&
-                  Number(userData?.contents_count) > 0
-                    ? userData?.contents_count
-                    : 0
-                } contents`}
-              </RgText>
-            </View>
+                <RgText
+                  style={[styles.creatorInfo__desc, { color: "#676C75" }]}
+                >
+                  {"•  " + shortenAddress(userData?.address || "", 4)}
+                </RgText>
+
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={{ ...padding(4, 4) }}
+                  onPress={() => {
+                    if (userData?.address) copyToClipboard(userData?.address);
+                  }}
+                >
+                  {copied ? (
+                    <View
+                      style={{
+                        width: 15,
+                        height: 15,
+                        borderRadius: 30,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#419B45",
+                      }}
+                    >
+                      <Check size={12} color={"#fff"} strokeWidth={3} />
+                    </View>
+                  ) : (
+                    <Copy size={12} strokeWidth={3} color={"#676C75"} />
+                  )}
+                </TouchableOpacity>
+              </View>
+            </Skeleton>
+
+            <Skeleton showContent={!!userData}>
+              <View
+                style={{
+                  gap: 7,
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <RgText
+                  style={[styles.creatorInfo__desc, { color: "#676C75" }]}
+                >
+                  {/* {shortenAddress(userData?.address || "")} */}
+                  {`${
+                    userData?.subscribers_count &&
+                    !isNaN(userData?.subscribers_count) &&
+                    Number(userData?.subscribers_count) > 0
+                      ? userData?.subscribers_count
+                      : 0
+                  } subscriber${
+                    (userData?.subscribers_count &&
+                    !isNaN(userData?.subscribers_count) &&
+                    Number(userData?.subscribers_count) > 0
+                      ? userData?.subscribers_count
+                      : 0) > 1
+                      ? "s"
+                      : ""
+                  }`}{" "}
+                  {`• ${
+                    userData?.contents_count &&
+                    !isNaN(userData?.contents_count) &&
+                    Number(userData?.contents_count) > 0
+                      ? userData?.contents_count
+                      : 0
+                  } contents`}
+                </RgText>
+              </View>
+            </Skeleton>
           </View>
         </View>
       </View>
@@ -198,55 +237,74 @@ const UserProfileHeader = ({
         </View>
       )}
 
-      <View style={[styles.accountStats]}>
-        <View pointerEvents="none" style={[styles.stats_row]}>
-          <View
-            style={{
-              gap: 32,
-              width: "100%",
-              flexDirection: "row",
-              // justifyContent: "space-between",
-            }}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <RgText style={[{ fontSize: 15, color: "#444" }]}>
-                Subscription:{" "}
-              </RgText>
-              <Text style={{ paddingTop: 3 }}>
-                {userData?.subscription_type === "free"
-                  ? "Free"
-                  : userData?.subscription_type === "monetary"
-                  ? `$${userData?.subscription_info?.amount ?? "0.00"}/mo`
-                  : ``}
-              </Text>
+      <Skeleton
+        showContent={!!userData}
+        style={{
+          ...(!userData && { marginTop: 16, marginHorizontal: 16 }),
+        }}
+        width={Layout.window.width - (userData ? 0 : 32)}
+      >
+        <View style={[styles.accountStats]}>
+          <View pointerEvents="none" style={[styles.stats_row]}>
+            <View
+              style={{
+                gap: 32,
+                width: "100%",
+                flexDirection: "row",
+                // justifyContent: "space-between",
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <RgText style={[{ fontSize: 15, color: "#444" }]}>
+                  Subscription:{" "}
+                </RgText>
+                <Text style={{ paddingTop: 3 }}>
+                  {userData?.subscription_type === "free"
+                    ? "Free"
+                    : userData?.subscription_type === "monetary"
+                    ? `$${userData?.subscription_info?.amount ?? "0.00"}/mo`
+                    : ``}
+                </Text>
 
-              {userData?.subscription_type === "nft" && (
-                <View style={[styles.nftSubscription]}>
-                  <View style={[styles.nftImage]}>
-                    <Image
-                      transition={300}
-                      contentFit="cover"
-                      style={[styles.nftImage_img]}
-                      source={{
-                        uri: userData?.subscription_info?.collection_image,
-                      }}
-                    />
+                {userData?.subscription_type === "nft" && (
+                  <View style={[styles.nftSubscription]}>
+                    <View style={[styles.nftImage]}>
+                      <Image
+                        transition={300}
+                        contentFit="cover"
+                        style={[styles.nftImage_img]}
+                        source={{
+                          uri: userData?.subscription_info?.collection_image,
+                        }}
+                      />
+                    </View>
+                    <Text style={{ fontSize: 14.5 }}>
+                      {userData?.subscription_info?.collection_name}
+                      <RgText style={{ fontSize: 13, color: "#666" }}>
+                        {" "}
+                        {"(NFT Pass)"}
+                      </RgText>
+                    </Text>
                   </View>
-                  <Text style={{ fontSize: 14.5 }}>
-                    {userData?.subscription_info?.collection_name}
-                    <RgText style={{ fontSize: 13, color: "#666" }}>
-                      {" "}
-                      {"(NFT Pass)"}
-                    </RgText>
-                  </Text>
-                </View>
-              )}
+                )}
+              </View>
             </View>
           </View>
         </View>
-      </View>
+      </Skeleton>
 
-      {userData?.address !== currentUser?.address && (
+      {!userData && (
+        <Skeleton
+          showContent={!!userData}
+          style={{
+            marginTop: 6,
+            marginHorizontal: 16,
+          }}
+          width={Layout.window.width - 32}
+        />
+      )}
+
+      {!!userData && userData?.address !== currentUser?.address && (
         <TouchableOpacity
           disabled={subscribing}
           onPress={() => {
@@ -309,7 +367,9 @@ const UserProfile = () => {
   const insets = useSafeAreaInsets();
   const { userSignature } = useAccount();
 
-  const { data, isLoading, error, refetch } = useQuery(
+  const [refreshing, setRefreshing] = useState(false);
+
+  const { data, refetch } = useQuery(
     ["profile", userSignature?.publicKey, profile],
     async () =>
       axios
@@ -324,6 +384,12 @@ const UserProfile = () => {
     }
   );
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, []);
+
   return (
     <View
       style={[
@@ -334,11 +400,17 @@ const UserProfile = () => {
       ]}
     >
       {!data?.is_subscribed ? (
-        <UserProfileHeader
-          userData={data}
-          offsetTop={false}
-          refetch={refetch}
-        />
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <UserProfileHeader
+            userData={data}
+            offsetTop={false}
+            refetch={refetch}
+          />
+        </ScrollView>
       ) : (
         <Tabs.Container
           lazy

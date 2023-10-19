@@ -1,11 +1,11 @@
 import axios from "axios";
-import { ArrowLeftRight, Image } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowLeftRight } from "lucide-react-native";
 import EmptyState from "components/shared/emptyState";
 import { useAccount } from "providers/AccountProvider";
 import { Tabs } from "react-native-collapsible-tab-view";
-import { RefreshControl } from "react-native-gesture-handler";
+import RefreshControl from "components/_common/RefreshControl";
 import AccountTransactionItem from "components/account/transactionItem";
 
 const AccountTransactons = () => {
@@ -77,7 +77,7 @@ const AccountTransactons = () => {
         paddingBottom: 24,
         paddingHorizontal: 16,
       }}
-      keyExtractor={(item, index) => index.toString()}
+      keyExtractor={(item: any) => item?.id}
     />
   );
 };

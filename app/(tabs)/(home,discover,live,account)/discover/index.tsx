@@ -1,23 +1,25 @@
-import { Fragment, useCallback, useState } from "react";
-import { styles } from "./discover.styles";
-import Content from "components/discover/content";
-import { Container } from "components/_ui/custom";
-import { RgText } from "components/_ui/typography";
-import Searchbar from "components/_common/Searchbar";
-import SearchHistory from "./searchOverlay/searchHistory";
-import MasonryList from "@react-native-seoul/masonry-list";
-import { Keyboard, TouchableOpacity, View } from "react-native";
-import { useApp } from "providers/AppProvider";
-import { useAccount } from "providers/AccountProvider";
-import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { IPost } from "typings/post";
-import { ScrollView } from "components/_ui/themed";
-import { RefreshControl } from "react-native-gesture-handler";
-import EmptyState from "components/shared/emptyState";
+import { styles } from "./discover.styles";
 import { Image } from "lucide-react-native";
+import { useApp } from "providers/AppProvider";
+import { useQuery } from "@tanstack/react-query";
+import useColorScheme from "hooks/useColorScheme";
+import { Container } from "components/_ui/custom";
+import Content from "components/discover/content";
+import { RgText } from "components/_ui/typography";
+import { ScrollView } from "components/_ui/themed";
+import Searchbar from "components/_common/Searchbar";
+import EmptyState from "components/shared/emptyState";
+import { useAccount } from "providers/AccountProvider";
+import { Fragment, useCallback, useState } from "react";
+import SearchHistory from "./searchOverlay/searchHistory";
+import MasonryList from "@react-native-seoul/masonry-list";
+import RefreshControl from "components/_common/RefreshControl";
+import { Keyboard, TouchableOpacity, View } from "react-native";
 
 const Discover = () => {
+  const isDark = useColorScheme() === "dark";
   const [search, setSearch] = useState("");
   const [showOverlay, setShowOverlay] = useState(false);
 
@@ -37,6 +39,7 @@ const Discover = () => {
         })
         .then((res) => res.data?.data?.results),
     {
+      refetchInterval: 1000 * 60 * 2, // refetch every 2 minutes
       enabled: !!userSignature?.signature,
     }
   );
@@ -114,9 +117,9 @@ const Discover = () => {
             refreshing={refreshing}
             onRefresh={onRefresh}
             numColumns={3}
-            renderItem={({ item }) => (
+            renderItem={({ item, i }) => (
               <Fragment>
-                <Content item={item as IPost} />
+                <Content item={item as IPost} contentIndex={i} />
               </Fragment>
             )}
             onEndReachedThreshold={0.1}
@@ -124,6 +127,7 @@ const Discover = () => {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={[styles.listContainer]}
+            refreshControlProps={{ tintColor: isDark ? "#ccc" : "#666" }}
           />
         )}
       </View>

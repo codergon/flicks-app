@@ -6,7 +6,7 @@ import { IPost } from "typings/post";
 import Layout from "constants/Layout";
 import { Heart } from "lucide-react-native";
 import { Lock } from "phosphor-react-native";
-import { useApp } from "providers/AppProvider";
+import { schedulePushNotification, useApp } from "providers/AppProvider";
 import { primaryColor } from "constants/Colors";
 import { useModals } from "providers/ModalsProvider";
 import PostCreator from "components/shared/postCreator";
@@ -24,6 +24,7 @@ import { useAccount } from "providers/AccountProvider";
 import Toast from "react-native-toast-message";
 import axios from "axios";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import PostComment from "../comment";
 
 interface PostProps {
   post: IPost;
@@ -228,108 +229,157 @@ const Post = ({ post, showBorder, showInteractions = true }: PostProps) => {
         </View>
       )}
 
-      {showInteractions && post?.is_purchased && (
-        <View style={[styles.post_footer]}>
-          <View style={[styles.post_stats]}>
-            {/* Likes */}
-            <TouchableOpacity
-              onPress={() => {
-                setIsLiked((l) => !l);
-                setLikesCount((c) => (isLiked ? c - 1 : c + 1));
-                debouncedFetchData(!isLiked ? "like" : "unlike");
-              }}
-              style={[styles.post_statsItem]}
-            >
-              {isLiked ? (
-                <Heart
-                  size={16}
-                  fill="#FF2F40"
-                  color={"#FF2F40"}
-                  strokeWidth={2}
-                />
-              ) : (
-                <Heart size={16} color="#000" strokeWidth={2} />
-              )}
-              <RgText style={[styles.post_statsItemText]}>
-                {millify(likesCount, {
-                  precision: 2,
-                  lowercase: true,
-                })}
-              </RgText>
-            </TouchableOpacity>
-
-            {/* Comments */}
-            <TouchableOpacity
-              onPress={() => {
-                openPostIntractionsModal({
-                  type: "comments",
-                  data: {
-                    postId: post?.id || "",
-                    comments: post?.comments,
-                  },
-                });
-              }}
-              style={[styles.post_statsItem]}
-            >
-              <MessageCircle size={15} color="#000" strokeWidth={2} />
-              <RgText style={[styles.post_statsItemText]}>
-                {millify(post?.comments_count ?? 0, {
-                  precision: 2,
-                  lowercase: true,
-                })}
-              </RgText>
-            </TouchableOpacity>
-          </View>
-
-          {/* Ellipses indicating current media item */}
-          {post?.media?.length > 1 && false && (
-            <View style={[styles.post_mediaDots]}>
-              {[1, 2, 3]?.map((_, index) => {
-                const dotWidth = scrollX.interpolate({
-                  inputRange: [
-                    (index - 1) * Layout.window.width,
-                    index * Layout.window.width,
-                    (index + 1) * Layout.window.width,
-                  ],
-                  outputRange: [6, 12, 6],
-                  extrapolate: "clamp",
-                });
-
-                const backgroundColor = scrollX.interpolate({
-                  inputRange: [
-                    (index - 1) * Layout.window.width,
-                    index * Layout.window.width,
-                    (index + 1) * Layout.window.width,
-                  ],
-                  outputRange: ["#ddd", primaryColor, "#ddd"],
-                  extrapolate: "clamp",
-                });
-
-                return (
-                  <Animated.View
-                    key={index}
-                    style={[
-                      styles.post_mediaDot,
-                      {
-                        width: dotWidth,
-                        backgroundColor:
-                          index === currentIndex ? primaryColor : "#ddd",
-                      },
-                    ]}
+      {post?.is_purchased &&
+        (showInteractions ? (
+          <View style={[styles.post_footer]}>
+            <View style={[styles.post_stats]}>
+              {/* Likes */}
+              <TouchableOpacity
+                onPress={() => {
+                  setIsLiked((l) => !l);
+                  setLikesCount((c) => (isLiked ? c - 1 : c + 1));
+                  debouncedFetchData(!isLiked ? "like" : "unlike");
+                }}
+                style={[styles.post_statsItem]}
+              >
+                {isLiked ? (
+                  <Heart
+                    size={16}
+                    fill="#FF2F40"
+                    color={"#FF2F40"}
+                    strokeWidth={2}
                   />
-                );
-              })}
-            </View>
-          )}
+                ) : (
+                  <Heart size={16} color="#000" strokeWidth={2} />
+                )}
+                <RgText style={[styles.post_statsItemText]}>
+                  {millify(likesCount, {
+                    precision: 2,
+                    lowercase: true,
+                  })}
+                </RgText>
+              </TouchableOpacity>
 
-          <View style={[styles.post_actions]}>
-            <View style={[styles.post_action]}>
-              {/* <Share size={16} color="#000" strokeWidth={2} /> */}
-              <Gift size={16} color="#000" strokeWidth={2} />
+              {/* Comments */}
+              <TouchableOpacity
+                onPress={() => {
+                  openPostIntractionsModal({
+                    type: "comments",
+                    data: {
+                      postId: post?.id || "",
+                      comments: post?.comments,
+                    },
+                  });
+                }}
+                style={[styles.post_statsItem]}
+              >
+                <MessageCircle size={15} color="#000" strokeWidth={2} />
+                <RgText style={[styles.post_statsItemText]}>
+                  {millify(post?.comments_count ?? 0, {
+                    precision: 2,
+                    lowercase: true,
+                  })}
+                </RgText>
+              </TouchableOpacity>
+            </View>
+
+            {/* Ellipses indicating current media item */}
+            {post?.media?.length > 1 && false && (
+              <View style={[styles.post_mediaDots]}>
+                {[1, 2, 3]?.map((_, index) => {
+                  const dotWidth = scrollX.interpolate({
+                    inputRange: [
+                      (index - 1) * Layout.window.width,
+                      index * Layout.window.width,
+                      (index + 1) * Layout.window.width,
+                    ],
+                    outputRange: [6, 12, 6],
+                    extrapolate: "clamp",
+                  });
+
+                  const backgroundColor = scrollX.interpolate({
+                    inputRange: [
+                      (index - 1) * Layout.window.width,
+                      index * Layout.window.width,
+                      (index + 1) * Layout.window.width,
+                    ],
+                    outputRange: ["#ddd", primaryColor, "#ddd"],
+                    extrapolate: "clamp",
+                  });
+
+                  return (
+                    <Animated.View
+                      key={index}
+                      style={[
+                        styles.post_mediaDot,
+                        {
+                          width: dotWidth,
+                          backgroundColor:
+                            index === currentIndex ? primaryColor : "#ddd",
+                        },
+                      ]}
+                    />
+                  );
+                })}
+              </View>
+            )}
+
+            <View style={[styles.post_actions]}>
+              <TouchableOpacity
+                onPress={() => {
+                  schedulePushNotification({
+                    title: "Coming soon",
+                    body: "Tipping is not yet available. We are working on it. Stay tuned!",
+                  });
+
+                  // Toast.show({
+                  //   type: "success",
+                  //   topOffset: insets.top + 10,
+                  //   text1: "Coming soon",
+                  //   text2:
+                  //     "Tipping is not yet available. We are working on it. Stay tuned!",
+                  // });
+                }}
+                style={[
+                  styles.post_action,
+                  {
+                    paddingVertical: 4,
+                    paddingHorizontal: 6,
+                  },
+                ]}
+              >
+                {/* <Share size={16} color="#000" strokeWidth={2} /> */}
+                <Gift size={16} color="#000" strokeWidth={2} />
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
-      )}
+        ) : (
+          <>
+            <View
+              style={{
+                gap: 10,
+                paddingVertical: 16,
+                paddingHorizontal: 16,
+                flexDirection: "column",
+              }}
+            >
+              {post?.likes_count > 0 && (
+                <RgText>
+                  Liked by{post?.is_liked ? " you and" : ""}{" "}
+                  {post?.likes_count - (post?.is_liked ? 1 : 0)}{" "}
+                  {(post?.is_liked ? "other " : "") +
+                    (post?.likes_count - (post?.is_liked ? 1 : 0) > 1
+                      ? "people"
+                      : "person")}
+                </RgText>
+              )}
+              {post?.comments_count > 0 && <Text>Comments</Text>}
+            </View>
+            {post.comments?.map((comment, index) => {
+              return <PostComment key={comment?.id} comment={comment} />;
+            })}
+          </>
+        ))}
     </View>
   );
 };

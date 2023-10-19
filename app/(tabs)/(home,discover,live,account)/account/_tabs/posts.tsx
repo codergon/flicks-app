@@ -2,14 +2,15 @@ import { IPost } from "typings/post";
 import Post from "components/shared/post";
 import { useApp } from "providers/AppProvider";
 import { useCallback, useState } from "react";
-import { RefreshControl } from "react-native";
 import { StyleSheet, View } from "react-native";
 import EmptyState from "components/shared/emptyState";
 import { Tabs } from "react-native-collapsible-tab-view";
 import { GalleryVerticalEnd } from "lucide-react-native";
+import RefreshControl from "components/_common/RefreshControl";
+import CurrentUpload from "components/account/currentUpload";
 
 const AccountPostsTab = () => {
-  const { usersPostQuery } = useApp();
+  const { currentUpload, usersPostQuery } = useApp();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
@@ -38,9 +39,9 @@ const AccountPostsTab = () => {
           error={usersPostQuery.error}
           isLoading={usersPostQuery.isLoading}
           data={{
+            message: "No posts yet",
             loadingText: "Fetching posts...",
             errorMessage: "An error occured while fetching posts",
-            message: "No posts yet",
           }}
         />
       </Tabs.ScrollView>
@@ -48,12 +49,15 @@ const AccountPostsTab = () => {
 
   return (
     <Tabs.FlatList
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
       data={usersPostQuery.data as IPost[]}
+      contentContainerStyle={{ paddingBottom: 50 }}
+      keyExtractor={(item, index) => item?.id ?? index.toString()}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
-      showsVerticalScrollIndicator={false}
-      showsHorizontalScrollIndicator={false}
+      ListHeaderComponent={() => (currentUpload ? <CurrentUpload /> : <></>)}
       renderItem={({ item, index }) => {
         return (
           <Post
@@ -62,8 +66,6 @@ const AccountPostsTab = () => {
           />
         );
       }}
-      contentContainerStyle={{ paddingBottom: 50 }}
-      keyExtractor={(item, index) => item?.id ?? index.toString()}
     />
   );
 };

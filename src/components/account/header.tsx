@@ -2,7 +2,13 @@ import { Fragment } from "react";
 import { router } from "expo-router";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ArrowLeft, MoreHorizontal, Pencil, X } from "lucide-react-native";
+import {
+  ArrowLeft,
+  MoreHorizontal,
+  Pencil,
+  Share,
+  X,
+} from "lucide-react-native";
 import { Gear } from "phosphor-react-native";
 
 const AccountHeaderBtns = () => {
@@ -17,12 +23,13 @@ const AccountHeaderBtns = () => {
           {
             right: 16,
             top: 10 + inset.top,
+            backgroundColor: "#141414c0",
           },
         ]}
       >
         {/* <MoreHorizontal size={18} color="#fff" /> */}
         {/* <Pencil size={14} color="#fff" /> */}
-        <Gear size={17} color="#fff" weight="regular" />
+        <Share size={17} color="#fff" strokeWidth={2.1} />
       </TouchableOpacity>
     </Fragment>
   );
@@ -39,6 +46,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     justifyContent: "center",
-    backgroundColor: "#14141460",
   },
 });

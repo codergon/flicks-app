@@ -16,7 +16,7 @@ const CommentsTab = () => {
           data={postInteractions?.comments}
           showsVerticalScrollIndicator={true}
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(item) => item?.id}
           renderItem={({ item }) => {
             return <PostComment comment={item} />;
           }}

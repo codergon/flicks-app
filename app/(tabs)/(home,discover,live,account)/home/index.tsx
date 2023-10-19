@@ -1,17 +1,16 @@
-import { Fragment, useCallback, useState } from "react";
+import axios from "axios";
+import { IPost } from "typings/post";
 import Post from "components/shared/post";
 import Topbar from "components/home/topbar";
-import { Container } from "components/_ui/custom";
-import { View, FlatList, StyleSheet } from "react-native";
-
-import axios from "axios";
-import { useAccount } from "providers/AccountProvider";
 import { useQuery } from "@tanstack/react-query";
+import { Container } from "components/_ui/custom";
 import { ScrollView } from "components/_ui/themed";
-import { RefreshControl } from "react-native-gesture-handler";
 import { CircleOff, List } from "lucide-react-native";
 import EmptyState from "components/shared/emptyState";
-import { IPost } from "typings/post";
+import { Fragment, useCallback, useState } from "react";
+import { useAccount } from "providers/AccountProvider";
+import { View, FlatList, StyleSheet } from "react-native";
+import RefreshControl from "components/_common/RefreshControl";
 
 const Home = () => {
   const { userSignature } = useAccount();

@@ -1,13 +1,13 @@
 import axios from "axios";
+import { Image } from "lucide-react-native";
+import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import EmptyState from "components/shared/emptyState";
 import { useAccount } from "providers/AccountProvider";
 import { Tabs } from "react-native-collapsible-tab-view";
 import ProfileMediaItem from "components/profile/mediaItem";
-import { RefreshControl } from "react-native-gesture-handler";
-import { Image } from "lucide-react-native";
-import { useCallback, useState } from "react";
+import RefreshControl from "components/_common/RefreshControl";
 
 const MediaGallery = () => {
   const { userSignature } = useAccount();
@@ -70,7 +70,7 @@ const MediaGallery = () => {
       }}
       ItemSeparatorComponent={() => <View style={{ height: 6 }} />}
       onEndReachedThreshold={0.1}
-      keyExtractor={(i: any) => i.toString()}
+      keyExtractor={(i: any) => i?.s3_key}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       style={[{ flex: 1 }]}
