@@ -1,28 +1,38 @@
 import { Image } from "expo-image";
 import { padding } from "helpers/styles";
-import { primaryColor } from "constants/Colors";
+import { primaryColor } from "constants/colors";
 import { MoreVertical } from "lucide-react-native";
 import { Eye, Lock, Star } from "phosphor-react-native";
 import { RgText, Text } from "components/_ui/typography";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import dayjs from "dayjs";
+import { router } from "expo-router";
 
 interface ContentProps {
   item: any;
-  showBorder?: boolean;
+  isLastItem?: boolean;
 }
 
-const LiveStreamItem = ({ item, showBorder = true }: ContentProps) => {
+const LiveStreamItem = ({ item, isLastItem = false }: ContentProps) => {
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={() => {
+        router.push({
+          pathname: `/livestream/`,
+          params: { streamId: item.id, streamDetails: JSON.stringify(item) },
+        });
+      }}
       style={[
         styles.content,
         {
           borderColor: "#f4f4f4",
-          // borderBottomWidth: showBorder ? 1 : 0,
+          marginBottom: isLastItem ? 20 : 0,
+          borderBottomWidth: isLastItem ? 0 : 1,
         },
       ]}
     >
-      <View
+      {/* <View
         style={[
           styles.imageContainer,
           {
@@ -34,9 +44,9 @@ const LiveStreamItem = ({ item, showBorder = true }: ContentProps) => {
           transition={300}
           contentFit="cover"
           style={[styles.image]}
-          source={require("assets/images/mock/1.png")}
+          source={{ blurhash: "LIG+2d-;yDv{P;s+MvVrv0WF+FOt" }}
         />
-      </View>
+      </View> */}
 
       <View style={[styles.details]}>
         <View
@@ -56,63 +66,69 @@ const LiveStreamItem = ({ item, showBorder = true }: ContentProps) => {
               },
             ]}
           >
-            13:00PM
+            {item?.start && dayjs(item?.start).format("h:mm A")}
           </Text>
 
-          <>
-            <Text
-              numberOfLines={1}
-              style={[
-                styles.date,
-                {
-                  color: "#676C75",
-                  marginHorizontal: 8,
-                },
-              ]}
-              children="•"
-            />
-            {item?.type !== "free" ? (
-              <Lock size={13} color={primaryColor} weight="fill" />
-            ) : (
-              <Star size={13} color={primaryColor} weight="fill" />
-            )}
-            <Text
-              numberOfLines={1}
-              style={[
-                styles.date,
-                {
-                  marginLeft: 4,
-                  color: "#676C75",
-                },
-              ]}
-            >
-              {item?.type === "free" ? "Free" : "Paid"}
-            </Text>
-          </>
+          {false && (
+            <>
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.date,
+                  {
+                    color: "#676C75",
+                    marginHorizontal: 8,
+                  },
+                ]}
+                children="•"
+              />
+
+              {item?.type !== "free" ? (
+                <Lock size={13} color={primaryColor} weight="fill" />
+              ) : (
+                <Star size={13} color={primaryColor} weight="fill" />
+              )}
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.date,
+                  {
+                    marginLeft: 4,
+                    color: "#676C75",
+                  },
+                ]}
+              >
+                {item?.type === "free" ? "Free" : "Paid"}
+              </Text>
+            </>
+          )}
         </View>
 
         <View
           style={{
-            maxHeight: 40,
+            gap: 4,
             marginBottom: 4,
-            flexWrap: "wrap",
-            flexDirection: "row",
+            overflow: "hidden",
+            flexDirection: "column",
           }}
         >
           <Text numberOfLines={2} style={[styles.title]}>
-            How to be a content creator based on true story.
+            {item?.title}
           </Text>
+          <RgText numberOfLines={2} style={[styles.description]}>
+            {item?.description}
+          </RgText>
         </View>
       </View>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         activeOpacity={0.8}
         style={[styles.moreBtn]}
         onPress={() => {}}
       >
         <MoreVertical size={18} color="#676C75" />
-      </TouchableOpacity>
-    </View>
+      </TouchableOpacity> */}
+    </TouchableOpacity>
   );
 };
 
@@ -121,7 +137,7 @@ export default LiveStreamItem;
 const styles = StyleSheet.create({
   content: {
     gap: 16,
-    ...padding(10, 20),
+    ...padding(14, 0),
     flexDirection: "row",
     paddingHorizontal: 16,
     alignItems: "center",
@@ -141,13 +157,18 @@ const styles = StyleSheet.create({
   },
 
   details: {
-    gap: 6,
+    gap: 4,
     flex: 1,
     flexDirection: "column",
   },
   title: {
     fontSize: 14,
     lineHeight: 20,
+  },
+  description: {
+    fontSize: 13,
+    lineHeight: 16,
+    color: "#676C75",
   },
   date: {
     fontSize: 13,

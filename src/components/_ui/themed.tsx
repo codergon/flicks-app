@@ -18,7 +18,7 @@ import {
   SafeAreaViewProps,
   SafeAreaView as DefaultSafeAreaView,
 } from "react-native-safe-area-context";
-import Colors from "constants/Colors";
+import Colors from "constants/colors";
 import useColorScheme from "hooks/useColorScheme";
 
 export function useThemeColor(

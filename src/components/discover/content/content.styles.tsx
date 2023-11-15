@@ -1,4 +1,4 @@
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { padding } from "helpers/styles";
 import { StyleSheet } from "react-native";
 

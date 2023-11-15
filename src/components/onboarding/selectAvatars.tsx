@@ -1,14 +1,9 @@
-import { useEffect, useRef } from "react";
 import { Image } from "expo-image";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { padding } from "helpers/styles";
-import {
-  View,
-  Animated,
-  FlatList,
-  StyleSheet,
-  useColorScheme,
-} from "react-native";
+import { useEffect, useRef } from "react";
+import useColorScheme from "hooks/useColorScheme";
+import { View, Animated, FlatList, StyleSheet } from "react-native";
 
 interface SelectAvatarsProps {
   setSelectedAvatar: (avatar: string) => void;
@@ -18,6 +13,8 @@ const avatars = Array.from({ length: 30 }).map(
   (_, i) => `https://api.dicebear.com/7.x/open-peeps/png?seed=${i}`
 );
 
+const baseWidth = 428;
+
 const SelectAvatars = ({ setSelectedAvatar }: SelectAvatarsProps) => {
   const theme = useColorScheme();
   const isDark = theme === "dark";
@@ -26,8 +23,8 @@ const SelectAvatars = ({ setSelectedAvatar }: SelectAvatarsProps) => {
 
   const scrollX = useRef(new Animated.Value(0)).current;
   const width = Layout.window.width;
-  const ITEM_SIZE = 78;
-  // const ITEM_SIZE = width * 0.1822429907;
+  const ratio = width / baseWidth;
+  const ITEM_SIZE = 78 * ratio;
   const ITEM_SPACING = (width - ITEM_SIZE) / 2;
 
   useEffect(() => {
@@ -41,7 +38,6 @@ const SelectAvatars = ({ setSelectedAvatar }: SelectAvatarsProps) => {
         pagingEnabled
         ref={flatList}
         bounces={false}
-        centerContent={true}
         initialNumToRender={20}
         disableIntervalMomentum
         onMomentumScrollEnd={(event) => {
@@ -77,6 +73,7 @@ const SelectAvatars = ({ setSelectedAvatar }: SelectAvatarsProps) => {
           paddingHorizontal: ITEM_SPACING,
         }}
         keyExtractor={(item, index) => index.toString()}
+        //
         renderItem={({ item, index }) => {
           const inputRange = [
             (index - 3) * ITEM_SIZE,
@@ -93,10 +90,10 @@ const SelectAvatars = ({ setSelectedAvatar }: SelectAvatarsProps) => {
             outputRange: [0.52, 0.62, 0.76, 1, 0.76, 0.62, 0.52],
           });
 
-          const mr1 = 4;
-          const mr2 = 34;
-          const mr3 = 92;
-          const mr4 = 192;
+          const mr1 = 4 * ratio;
+          const mr2 = 34 * ratio;
+          const mr3 = 92 * ratio;
+          const mr4 = 192 * ratio;
 
           const marginRight = scrollX.interpolate({
             inputRange: [

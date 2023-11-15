@@ -3,7 +3,7 @@ import BottomSheet, {
   BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
 import { useMemo } from "react";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { Keyboard } from "react-native";
 import AccountConfigs from "./accountConfigs";
 import { useModals } from "providers/ModalsProvider";

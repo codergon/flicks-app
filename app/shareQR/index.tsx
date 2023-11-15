@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { router } from "expo-router";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { Check } from "lucide-react-native";
 import QRCode from "react-native-qrcode-svg";
 import useClipboard from "hooks/useClipboard";
 import ViewShot from "react-native-view-shot";
 import { Copy, X } from "lucide-react-native";
-import { primaryColor } from "constants/Colors";
+import { primaryColor } from "constants/colors";
 import shortenAddress from "utils/shortenAddress";
 import { useAccount } from "providers/AccountProvider";
 import { RgText, Text } from "components/_ui/typography";

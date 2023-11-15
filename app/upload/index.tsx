@@ -1,13 +1,14 @@
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { StatusBar } from "react-native";
-import { useApp } from "providers/AppProvider";
 import { useFocusEffect } from "expo-router";
+import { useApp } from "providers/AppProvider";
 import { Container } from "components/_ui/custom";
 import UploadFooter from "components/upload/footer";
 import { useCallback, useRef, useState } from "react";
+import ImageMedia from "components/upload/ImageMedia";
+import VideoMedia from "components/upload/VideoMedia";
 import { View, Animated, FlatList } from "react-native";
 import UploadHeaderBtns from "components/upload/header";
-import MediaItemView from "components/upload/mediaItemView";
 import UploadMediaPreview from "components/upload/mediaPreview";
 
 const Upload = () => {
@@ -64,7 +65,15 @@ const Upload = () => {
           ItemSeparatorComponent={() => (
             <View style={{ width: 10, height: "100%" }} />
           )}
-          renderItem={({ item, index }) => <MediaItemView media={item} />}
+          renderItem={({ item, index }) => (
+            <>
+              {item?.type === "video" ? (
+                <VideoMedia media={item} />
+              ) : (
+                <ImageMedia media={item} />
+              )}
+            </>
+          )}
           onScroll={(event) => {
             Animated.event(
               [{ nativeEvent: { contentOffset: { x: scrollX } } }],

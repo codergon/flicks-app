@@ -4,7 +4,7 @@ import { padding } from "helpers/styles";
 import { Animated, StyleSheet } from "react-native";
 import { TouchableOpacity, View } from "react-native";
 import { RgText, Text } from "components/_ui/typography";
-import Colors, { primaryColor } from "constants/Colors";
+import Colors, { primaryColor } from "constants/colors";
 import { RectButton, Swipeable } from "react-native-gesture-handler";
 import { useState } from "react";
 import useColorScheme from "hooks/useColorScheme";

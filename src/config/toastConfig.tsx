@@ -3,7 +3,7 @@ import {
   ErrorToast,
   BaseToastProps,
 } from "react-native-toast-message";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import useColorScheme from "hooks/useColorScheme";
 
 const toastConfig = {

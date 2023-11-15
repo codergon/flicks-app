@@ -1,4 +1,4 @@
-import Colors from "constants/Colors";
+import Colors from "constants/colors";
 import { StyleSheet } from "react-native";
 import { Globe } from "lucide-react-native";
 import { View } from "components/_ui/themed";

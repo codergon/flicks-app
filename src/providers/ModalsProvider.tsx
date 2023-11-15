@@ -25,7 +25,7 @@ const ModalsProvider = ({ children }: ModalsProviderProps) => {
 
   // create content
   const openCreateContentModal = () => {
-    createContentRef.current?.expand();
+    createContentRef.current?.snapToIndex(0);
   };
   const closeCreateContentModal = () => {
     createContentRef.current?.close();

@@ -73,7 +73,7 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
+      // alert("Failed to get push token for push notification!");
       return;
     }
 
@@ -91,7 +91,7 @@ async function registerForPushNotificationsAsync() {
 
 const AppProvider = ({ children }: AppProviderProps) => {
   const insets = useSafeAreaInsets();
-  const { userSignature } = useAccount();
+  const { userSignature, userData } = useAccount();
 
   // State
   const [uploading, setUploading] = useState(false);
@@ -214,7 +214,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
         })
         .then((res) => res.data?.data?.results),
     {
-      enabled: !!userSignature?.signature,
+      enabled: !!userData?.address && !!userSignature?.publicKey,
     }
   );
 
@@ -356,6 +356,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
     price: number,
     isRetry: boolean = false
   ) => {
+    let success = false;
     try {
       setUploading(true);
       setUploadError(null);
@@ -460,10 +461,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
       // refetch user data
       await usersPostQuery.refetch();
 
-      await schedulePushNotification({
-        title: "Upload complete!",
-        body: "Your content is now live",
-      });
+      success = true;
 
       // reset state
       setSelectedMedia([]);
@@ -479,6 +477,12 @@ const AppProvider = ({ children }: AppProviderProps) => {
       });
     } finally {
       setUploading(false);
+      if (success) {
+        await schedulePushNotification({
+          title: "Upload complete!",
+          body: "Your content is now live",
+        });
+      }
     }
   };
 

@@ -1,7 +1,7 @@
 import { padding } from "helpers/styles";
 import Creator from "components/shared/creator";
 import { Text } from "components/_ui/typography";
-import { primaryColor } from "constants/Colors";
+import { primaryColor } from "constants/colors";
 import { FlatList, StyleSheet, View } from "react-native";
 import { Tabs } from "react-native-collapsible-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

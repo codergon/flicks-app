@@ -3,7 +3,7 @@ import BottomSheet, {
   BottomSheetTextInput,
   BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import {
   View,
   Keyboard,
@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useMemo, useState } from "react";
-import { primaryColor } from "constants/Colors";
+import { primaryColor } from "constants/colors";
 import { useModals } from "providers/ModalsProvider";
 import CustomBackground from "components/modals/custombackground";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

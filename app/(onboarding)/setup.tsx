@@ -2,18 +2,20 @@ import styles from "./onboarding.styles";
 import { Check } from "lucide-react-native";
 import Toast from "react-native-toast-message";
 import { Container } from "components/_ui/custom";
+import useColorScheme from "hooks/useColorScheme";
+import { Fragment, useEffect, useState } from "react";
 import { useAccount } from "providers/AccountProvider";
-import { Fragment, useEffect, useRef, useState } from "react";
 import SelectAvatars from "components/onboarding/selectAvatars";
 import { InputRg, RgText, Text } from "components/_ui/typography";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   View,
-  useColorScheme,
+  Platform,
+  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const AccountSetup = () => {
   const insets = useSafeAreaInsets();
@@ -46,19 +48,23 @@ const AccountSetup = () => {
   }, [username]);
 
   return (
-    <Fragment>
-      <Container
-        style={{
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom + 30,
-        }}
+    <Container
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom + 30,
+      }}
+    >
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <KeyboardAwareScrollView
+        <ScrollView
           bounces={false}
           style={{
             flex: 1,
             width: "100%",
           }}
+          keyboardShouldPersistTaps="never"
         >
           <View style={[styles.header]}>
             <Text style={[styles.headerTitle]}>Let’s get started!</Text>
@@ -157,7 +163,6 @@ const AccountSetup = () => {
                     fontSize: 14,
                     marginTop: 10,
                     paddingHorizontal: 6,
-                    // textAlign: "center",
                   },
                 ]}
               >
@@ -231,73 +236,73 @@ const AccountSetup = () => {
               </View>
             </Fragment>
           </View>
-        </KeyboardAwareScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
-        <View
-          style={{
-            width: "100%",
-            alignItems: "center",
-            paddingHorizontal: 16,
-            justifyContent: "center",
+      <View
+        style={{
+          width: "100%",
+          alignItems: "center",
+          paddingHorizontal: 16,
+          justifyContent: "center",
+        }}
+      >
+        <TouchableOpacity
+          disabled={isCreatingAccount}
+          onPress={() => {
+            if (username.trim().length < 3 || username.includes(".sol")) {
+              Toast.show({
+                type: "error",
+                text1: "Invalid username",
+                text2:
+                  "Username must be 3-20 characters long and cannot include '.sol'.",
+                topOffset: insets.top + 10,
+              });
+            } else {
+              prepareUser({
+                bio,
+                image_url: selectedAvatar,
+                moniker: (useDomainName && acctSNS
+                  ? acctSNS
+                  : username
+                )?.toLowerCase(),
+              });
+            }
           }}
+          style={[
+            styles.continueBtn,
+            {
+              opacity:
+                username.trim().length < 3 || username.trim().length > 20
+                  ? 10.7
+                  : 1,
+              backgroundColor: invert,
+            },
+          ]}
         >
-          <TouchableOpacity
-            disabled={isCreatingAccount}
-            onPress={() => {
-              if (username.trim().length < 3 || username.includes(".sol")) {
-                Toast.show({
-                  type: "error",
-                  text1: "Invalid username",
-                  text2:
-                    "Username must be 3-20 characters long and cannot include '.sol'.",
-                  topOffset: insets.top + 10,
-                });
-              } else {
-                prepareUser({
-                  bio,
-                  image_url: selectedAvatar,
-                  moniker: (useDomainName && acctSNS
-                    ? acctSNS
-                    : username
-                  )?.toLowerCase(),
-                });
-              }
+          <Text
+            lightColor="#fff"
+            darkColor="#000"
+            style={{
+              fontSize: 16,
             }}
-            style={[
-              styles.continueBtn,
-              {
-                opacity:
-                  username.trim().length < 3 || username.trim().length > 20
-                    ? 10.7
-                    : 1,
-                backgroundColor: invert,
-              },
-            ]}
           >
-            <Text
-              lightColor="#fff"
-              darkColor="#000"
-              style={{
-                fontSize: 16,
-              }}
-            >
-              Continue
-            </Text>
+            Continue
+          </Text>
 
-            {isCreatingAccount && (
-              <ActivityIndicator
-                size={"small"}
-                style={{
-                  right: 16,
-                  position: "absolute",
-                }}
-                color={isDark ? "#000" : "#fff"}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-      </Container>
-    </Fragment>
+          {isCreatingAccount && (
+            <ActivityIndicator
+              size={"small"}
+              style={{
+                right: 16,
+                position: "absolute",
+              }}
+              color={isDark ? "#000" : "#fff"}
+            />
+          )}
+        </TouchableOpacity>
+      </View>
+    </Container>
   );
 };
 

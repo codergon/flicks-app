@@ -8,7 +8,7 @@ import AppToast from "components/_common/appToast";
 // Modals
 import EditProfileModal from "components/modals/edit-profile";
 import WithdrawalModal from "components/modals/withdraw-popup";
-import CreateContentModal from "components/modals/create-content";
+import ContentOptionsModal from "components/modals/content-options";
 import DepositAddressesModal from "components/modals/deposit-address";
 import PostInteractionsModal from "components/modals/post-interactions";
 
@@ -56,6 +56,16 @@ function RootLayoutNav() {
           screenOptions={{ headerShown: false, animation: "fade" }}
         >
           <Stack.Screen name="index" redirect />
+
+          <Stack.Screen
+            name="livestream"
+            options={{
+              gestureDirection: "vertical",
+              animation: "fade_from_bottom",
+              presentation: "fullScreenModal",
+            }}
+          />
+
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
           <Stack.Screen
@@ -78,7 +88,7 @@ function RootLayoutNav() {
 
         <WithdrawalModal />
         <EditProfileModal />
-        <CreateContentModal />
+        <ContentOptionsModal />
         <PostInteractionsModal />
         <DepositAddressesModal />
 

@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { padding } from "helpers/styles";
 import { StyleSheet } from "react-native";
-import { primaryColor } from "constants/Colors";
+import { primaryColor } from "constants/colors";
 import useColorScheme from "hooks/useColorScheme";
 import { TouchableOpacity, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";

@@ -29,8 +29,7 @@ const CurrentUpload = () => {
         {currentUpload?.caption && (
           <View style={[styles.post_textContainer]}>
             <LightText numberOfLines={2} style={[styles.post_text]}>
-              {currentUpload?.caption} Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Dolore nihil perspiciatis quidem?
+              {currentUpload?.caption}
             </LightText>
           </View>
         )}

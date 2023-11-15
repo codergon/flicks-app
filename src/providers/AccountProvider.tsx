@@ -24,6 +24,7 @@ import {
   encryptPayload,
 } from "utils/phantom";
 import { RecentSearches } from "typings/common";
+import { Image } from "expo-image";
 
 const NETWORK = clusterApiUrl("mainnet-beta");
 
@@ -83,6 +84,15 @@ export default function AccountProvider(props: AccountProviderProps) {
   const [isCreatingAccount, setIsCreatingAccount] = useState<boolean>(false);
   const [authorizationInProgress, setAuthorizationInProgress] = useState(false);
 
+  const clearCache = async () => {
+    try {
+      await Image.clearDiskCache();
+      await Image.clearMemoryCache();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // set deep link
   useEffect(() => {
     (async () => {
@@ -91,8 +101,13 @@ export default function AccountProvider(props: AccountProviderProps) {
         setDeepLink(initialUrl);
       }
     })();
+
+    clearCache();
+
     Linking.addEventListener("url", handleDeepLink);
-    return () => {};
+    return () => {
+      clearCache();
+    };
   }, []);
 
   const fetchSNS = async (
@@ -138,6 +153,7 @@ export default function AccountProvider(props: AccountProviderProps) {
     const params = new URLSearchParams({
       dapp_encryption_public_key: bs58.encode(dappKeyPair.publicKey),
       nonce: bs58.encode(nonce),
+      app_url: "https://flicksapp.vercel.app",
       redirect_link: onSignMessageRedirectLink,
       payload: bs58.encode(encryptedPayload),
     });

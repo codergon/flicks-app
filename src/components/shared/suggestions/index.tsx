@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import styles from "./suggestions.styles";
 import { ChevronRight } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";

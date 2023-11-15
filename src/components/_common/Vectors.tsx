@@ -1,4 +1,4 @@
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import Svg, {
   Circle,
   ClipPath,

@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import { padding } from "helpers/styles";
 import { Clock3 } from "lucide-react-native";
-import { primaryColor } from "constants/Colors";
+import { primaryColor } from "constants/colors";
 import { RgText } from "components/_ui/typography";
 import EmptyState from "components/shared/emptyState";
 import { Tabs } from "react-native-collapsible-tab-view";
@@ -43,7 +43,7 @@ const TipsTab = () => {
                 >
                   <Image
                     style={[styles.userImage]}
-                    source={require("assets/images/mock/1.png")}
+                    source={{ blurhash: "LIG+2d-;yDv{P;s+MvVrv0WF+FOt" }}
                     contentFit="cover"
                     transition={300}
                   />

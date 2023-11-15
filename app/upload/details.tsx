@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { ActivityIndicator, StatusBar } from "react-native";
-import { styles } from "./details.styles";
+import { styles } from "./styles/details.styles";
 import { useApp } from "providers/AppProvider";
 import { Container } from "components/_ui/custom";
 import React, { useCallback, useState } from "react";

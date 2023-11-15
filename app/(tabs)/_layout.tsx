@@ -1,4 +1,4 @@
-import Colors from "constants/Colors";
+import Colors from "constants/colors";
 import { Redirect, Tabs } from "expo-router";
 import Icons from "components/_common/Icons";
 import Loader from "components/_common/Loader";
@@ -6,6 +6,7 @@ import useColorScheme from "hooks/useColorScheme";
 import { useModals } from "providers/ModalsProvider";
 import { TouchableOpacity, View } from "react-native";
 import { useAccount } from "providers/AccountProvider";
+import { Rss } from "phosphor-react-native";
 
 function TabBarIcon(props: { label: string; color: string }) {
   return (
@@ -21,9 +22,10 @@ function TabBarIcon(props: { label: string; color: string }) {
         <Icons.Home size={22} color={props.color} />
       ) : props.label === "discover" ? (
         <Icons.Discover size={22} color={props.color} />
-      ) : props.label === "live" ? (
-        <Icons.Broadcast size={21} color={props.color} />
-      ) : props.label === "account" ? (
+      ) : props.label === "streams" ? (
+        <Rss size={22} color={props.color} />
+      ) : // <Icons.Broadcast size={21} color={props.color} />
+      props.label === "account" ? (
         <Icons.Wallet size={22} color={props.color} />
       ) : (
         <Icons.Create size={30} color={props.color} />
@@ -123,10 +125,12 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="(live)"
+        name="(streams)"
         options={{
-          title: "Live",
-          tabBarIcon: ({ color }) => <TabBarIcon label="live" color={color} />,
+          title: "Streams",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon label="streams" color={color} />
+          ),
         }}
       />
 

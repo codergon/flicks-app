@@ -2,7 +2,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { Keyboard } from "react-native";
 import { useMemo, useState } from "react";
 import DepositAddresses from "./depositAddresses";

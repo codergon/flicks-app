@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { useEffect, useState } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { CameraOff, Scan, X } from "lucide-react-native";
@@ -15,10 +15,11 @@ const ScanQR = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   useEffect(() => {
-    (async () => {
+    const getPermission = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
-    })();
+    };
+    getPermission();
   }, []);
 
   const handleBarCodeScanned = ({ type, data }: any) => {

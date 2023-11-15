@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { RgText } from "components/_ui/typography";
 
 import { router } from "expo-router";
-import { primaryColor } from "constants/Colors";
+import { primaryColor } from "constants/colors";
 import { CreditCard, LockOpen } from "phosphor-react-native";
 import { Banknote, Gift, Sparkles, Wallet } from "lucide-react-native";
 import TimeAgo from "components/_common/TimeAgo";

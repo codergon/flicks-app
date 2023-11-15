@@ -175,7 +175,7 @@ const WithdrawalPopUp = ({ price, setPrice }: WithdrawalPopUpProps) => {
                 color: "#fff",
               }}
             >
-              Widthdraw
+              Withdraw
             </RgText>
 
             {withdrawing && (

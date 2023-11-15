@@ -1,6 +1,6 @@
 import axios from "axios";
 import NFTItem from "./NFTItem";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { X } from "phosphor-react-native";
 import { Fragment, useState } from "react";
 import { styles } from "./editProfile.styles";

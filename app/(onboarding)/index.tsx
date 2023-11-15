@@ -1,17 +1,13 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Image } from "expo-image";
 import Br from "components/_common/Br";
 import styles from "./onboarding.styles";
+import useColorScheme from "hooks/useColorScheme";
 import { Container } from "components/_ui/custom";
 import { useAccount } from "providers/AccountProvider";
 import { RgText, Text } from "components/_ui/typography";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  View,
-  TouchableOpacity,
-  useColorScheme,
-  ActivityIndicator,
-} from "react-native";
+import { View, TouchableOpacity, ActivityIndicator } from "react-native";
 
 const Onboarding = () => {
   const insets = useSafeAreaInsets();

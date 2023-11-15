@@ -1,4 +1,4 @@
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { StatusBar, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

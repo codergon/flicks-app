@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import Layout from "constants/Layout";
+import Layout from "constants/layout";
 import { padding } from "helpers/styles";
 import { useRef, useState } from "react";
 import triggerAudio from "utils/playSound";
