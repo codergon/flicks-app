@@ -12,14 +12,15 @@ import CustomBackground from "components/modals/custombackground";
 const EditProfileModal = () => {
   const { updateAccountRef } = useModals();
   const snapPoints = useMemo(
-    () => [Math.min(Math.max(340, Layout.window.height * 0.4), 380)],
+    () => [Math.min(Math.max(340, Layout.window.height * 0.5), 400)],
     []
   );
 
   return (
     <BottomSheet
       detached
-      index={-1}
+      // index={-1}
+      index={0}
       enablePanDownToClose
       ref={updateAccountRef}
       snapPoints={snapPoints}

@@ -33,7 +33,7 @@ const WithdrawalPopUp = ({ price, setPrice }: WithdrawalPopUpProps) => {
         },
         {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         }
       );

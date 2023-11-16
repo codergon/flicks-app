@@ -41,14 +41,14 @@ export const unstable_settings = {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { openCreateContentModal } = useModals();
-  const { userData, isAuthenticating, userSignature } = useAccount();
+  const { userData, isAuthenticating } = useAccount();
 
   if (isAuthenticating) {
     return <Loader />;
   }
 
   if (!userData) {
-    return <Redirect href={`/(onboarding)${userSignature ? "/setup" : ""}`} />;
+    return <Redirect href={`/(onboarding)`} />;
   }
 
   return (

@@ -116,7 +116,7 @@ const StartStream = ({ tabsRef, isSchedule }: ContentOptionsProps) => {
         },
         {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         }
       );

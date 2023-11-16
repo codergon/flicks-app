@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { CameraOff, Scan, X } from "lucide-react-native";
 import { RgText, Text } from "components/_ui/typography";
-import validateSolanaAddress from "utils/validateAddress";
+// import validateAlgorandAddress from "utils/validateAddress";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAccount } from "providers/AccountProvider";
@@ -25,13 +25,13 @@ const ScanQR = () => {
   const handleBarCodeScanned = ({ type, data }: any) => {
     if (data?.length < 44) return;
 
-    if (validateSolanaAddress(data)) {
-      if (userData?.address === data) {
-        router.push(`/(tabs)/(account)/account`);
-      } else {
-        router.push(`/(tabs)/(home)/${data as any}`);
-      }
-    }
+    // if (validateAlgorandAddress(data)) {
+    //   if (userData?.address === data) {
+    //     router.push(`/(tabs)/(account)/account`);
+    //   } else {
+    //     router.push(`/(tabs)/(home)/${data as any}`);
+    //   }
+    // }
   };
 
   const renderCamera = () => {

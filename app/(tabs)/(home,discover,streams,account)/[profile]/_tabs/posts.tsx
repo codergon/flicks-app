@@ -14,17 +14,17 @@ const ProfilePostsTab = ({ profile = "" }) => {
   const { userSignature } = useAccount();
 
   const usersPostQuery = useQuery(
-    ["profile-posts", userSignature?.publicKey],
+    ["profile-posts", userSignature],
     async () =>
       axios
         .get(`/contents/creators/${profile}`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.data?.results),
     {
-      enabled: !!userSignature?.signature && !!profile,
+      enabled: !!userSignature && !!profile,
     }
   );
 

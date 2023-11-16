@@ -76,7 +76,7 @@ const Post = ({ post, showBorder, showInteractions = true }: PostProps) => {
 
       await axios.post(`/contents/${post?.id}/pay`, undefined, {
         headers: {
-          Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          Authorization: `Signature ${userSignature}`,
         },
       });
 

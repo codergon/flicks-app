@@ -1,13 +1,20 @@
-import { Fragment, useEffect, useState } from "react";
 import { Image } from "expo-image";
 import Br from "components/_common/Br";
 import styles from "./onboarding.styles";
+import { Fragment, useState } from "react";
+import { mnemonicToSecretKey } from "algosdk";
 import useColorScheme from "hooks/useColorScheme";
-import { Container } from "components/_ui/custom";
 import { useAccount } from "providers/AccountProvider";
 import { RgText, Text } from "components/_ui/typography";
+import AppStatusBar from "components/_common/AppStatusbar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, TouchableOpacity, ActivityIndicator } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 
 const Onboarding = () => {
   const insets = useSafeAreaInsets();
@@ -15,16 +22,41 @@ const Onboarding = () => {
   const invert = isDark ? "#fff" : "#000";
   const description = isDark ? "#ccc" : "#676C75";
 
-  const { authorizationInProgress, connect, isCheckingUser, isFetchingSNS } =
-    useAccount();
+  const [warning, setWarning] = useState("");
+  const [privateKey, setPrivateKey] = useState("");
+
+  const {
+    connectWallet,
+    isCheckingUser,
+    isFetchingANS,
+    authorizationInProgress,
+  } = useAccount();
+
+  async function handleConnectWallet() {
+    let addr: string = "";
+    try {
+      const mnemonic =
+        "venture limb caution dolphin deal elegant aware faculty raw twist trumpet travel flame body sunset border fluid truth climb engage faint enrich risk abstract renew";
+
+      const res = mnemonicToSecretKey(mnemonic);
+      addr = res.addr;
+      setWarning("");
+    } catch (e) {
+      setWarning("Invalid mnemonic phrase supplied. Please try again.");
+      return;
+    }
+
+    if (addr) connectWallet(addr);
+  }
 
   return (
     <Fragment>
       {/* <AppStatusBar backgroundColor="#000" barStyle="light-content" /> */}
 
-      <Container
-        style={{
+      <KeyboardAwareScrollView
+        contentContainerStyle={{
           gap: 50,
+          flex: 1,
           paddingTop: insets.top + 40,
           paddingBottom: insets.bottom + 30,
         }}
@@ -32,6 +64,7 @@ const Onboarding = () => {
         <View
           style={{
             flex: 1,
+            // height: 500,
             width: "100%",
           }}
         >
@@ -44,7 +77,6 @@ const Onboarding = () => {
 
         <View
           style={{
-            gap: 44,
             width: "100%",
             paddingHorizontal: 16,
           }}
@@ -52,6 +84,7 @@ const Onboarding = () => {
           <View
             style={{
               gap: 10,
+              marginBottom: 44,
               alignItems: "center",
               flexDirection: "column",
             }}
@@ -78,45 +111,98 @@ const Onboarding = () => {
             </RgText>
           </View>
 
-          <TouchableOpacity
-            onPress={connect}
-            disabled={authorizationInProgress || isFetchingSNS}
-            style={[
-              styles.continueBtn,
-              {
-                backgroundColor: invert,
-              },
-            ]}
-          >
-            <Text
-              lightColor="#fff"
-              darkColor="#000"
-              style={{
-                fontSize: 16,
-              }}
-            >
-              {isFetchingSNS
-                ? "Fetching SNS..."
-                : isCheckingUser
-                ? "Authenticating account"
-                : authorizationInProgress
-                ? "Connecting Wallet"
-                : "Connect Wallet"}
-            </Text>
-
-            {(isFetchingSNS || isCheckingUser || authorizationInProgress) && (
-              <ActivityIndicator
-                size={"small"}
+          <View style={{ flexDirection: "column" }}>
+            {warning && (
+              <Text
                 style={{
-                  right: 16,
-                  position: "absolute",
+                  fontSize: 12,
+                  marginBottom: 10,
+                  color: "#ed693d",
+                  textAlign: "center",
                 }}
-                color={isDark ? "#000" : "#fff"}
-              />
+              >
+                {warning}
+              </Text>
             )}
-          </TouchableOpacity>
+
+            <View
+              style={[
+                {
+                  gap: 24,
+                  minHeight: 50,
+                  borderWidth: 1,
+                  borderRadius: 14,
+                  marginBottom: 20,
+                  paddingVertical: 4,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  borderColor: "#d8d8d8",
+                  justifyContent: "space-between",
+                },
+              ]}
+            >
+              <TextInput
+                multiline
+                numberOfLines={2}
+                value={privateKey}
+                keyboardType="default"
+                onChangeText={(text) => setPrivateKey(text)}
+                style={[
+                  {
+                    flex: 1,
+                    fontSize: 15,
+                    color: "#000",
+                    height: "100%",
+                    lineHeight: 24,
+                    paddingHorizontal: 14,
+                    fontFamily: "DMSans-Regular",
+                  },
+                ]}
+                placeholderTextColor={"#444"}
+                placeholder="Enter your mnemonic phrase here..."
+              />
+            </View>
+
+            <TouchableOpacity
+              onPress={handleConnectWallet}
+              disabled={authorizationInProgress || isFetchingANS}
+              style={[
+                styles.continueBtn,
+                {
+                  backgroundColor: invert,
+                },
+              ]}
+            >
+              <Text
+                lightColor="#fff"
+                darkColor="#000"
+                style={{
+                  fontSize: 16,
+                }}
+              >
+                {isFetchingANS
+                  ? "Fetching ANS..."
+                  : isCheckingUser
+                  ? "Authenticating account"
+                  : authorizationInProgress
+                  ? "Connecting Wallet"
+                  : "Connect Wallet"}
+              </Text>
+
+              {(isFetchingANS || isCheckingUser || authorizationInProgress) && (
+                <ActivityIndicator
+                  size={"small"}
+                  style={{
+                    right: 16,
+                    position: "absolute",
+                  }}
+                  color={isDark ? "#000" : "#fff"}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
-      </Container>
+      </KeyboardAwareScrollView>
     </Fragment>
   );
 };

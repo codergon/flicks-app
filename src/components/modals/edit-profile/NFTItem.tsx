@@ -1,24 +1,23 @@
-import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 import { Text } from "components/_ui/typography";
-import nftCollections from "constants/nftCollections";
 
 interface NFTItemProps {
-  data: (typeof nftCollections)[0];
+  data: {
+    token_decimals: number;
+    token_id: string;
+    token_name: string;
+  };
 }
 
 const NFTItem = ({ data }: NFTItemProps) => {
   return (
     <View style={[styles.container]}>
-      <View style={[styles.nftImage]}>
-        <Image
-          transition={300}
-          contentFit="cover"
-          style={[styles.image]}
-          source={{ uri: data?.image }}
-        />
-      </View>
-      <Text style={{ fontSize: 15 }}>{data?.name}</Text>
+      <Text style={{ fontSize: 15 }}>
+        {data?.token_name}
+        <Text
+          style={{ fontSize: 14, color: "#666" }}
+        >{` (${data?.token_id})`}</Text>
+      </Text>
     </View>
   );
 };
@@ -29,6 +28,7 @@ const styles = StyleSheet.create({
   container: {
     gap: 10,
     flex: 1,
+    minHeight: 28,
     alignItems: "center",
     flexDirection: "row",
   },

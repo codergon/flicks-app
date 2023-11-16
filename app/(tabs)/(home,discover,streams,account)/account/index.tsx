@@ -333,6 +333,19 @@ const UserAccountHeader = () => {
                   </Text>
                 </View>
               )}
+
+              {userData?.subscription_type === "token gated" && (
+                <View style={[styles.nftSubscription]}>
+                  <Text style={{ fontSize: 14.5 }}>
+                    {userData?.subscription_info?.minimum_token_balance}{" "}
+                    {userData?.subscription_info?.token_name} required
+                    <RgText style={{ fontSize: 13, color: "#666" }}>
+                      {" "}
+                      {"(ASA Gated)"}
+                    </RgText>
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         </View>

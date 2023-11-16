@@ -20,18 +20,39 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 
+const ASAs = [
+  {
+    token_decimals: 8,
+    token_id: "12400859",
+    token_name: "EURe",
+  },
+  {
+    token_decimals: 5,
+    token_id: "105371557",
+    token_name: "MONT",
+  },
+  {
+    token_decimals: 6,
+    token_id: "14704676",
+    token_name: "wALGOTs",
+  },
+];
+
 const AccountConfigs = () => {
   const { closeUpdateAccountModal } = useModals();
   const { userData, userSignature, fetchUserData } = useAccount();
 
   const [price, setPrice] = useState("");
+  const [tokenBalance, setTokenBalance] = useState("");
   const [updating, setUpdating] = useState(false);
 
-  const [nfts, setNfts] = useState(nftCollections);
-  const [selectedNft, setSelectedNft] = useState(nfts[0]);
-  const [acctType, setAcctType] = useState<"monetary" | "free" | "nft">("free");
+  const [selectedNft, setSelectedNft] = useState<any>(ASAs[0]);
+  const [acctType, setAcctType] = useState<"monetary" | "free" | "token gated">(
+    "free"
+  );
 
   const handleUpdateAccount = async () => {
+    if (acctType === "token gated" && Number(tokenBalance) < 1) return;
     if (acctType === "free" && userData?.subscription_type === "free") {
       closeUpdateAccountModal();
       return;
@@ -44,17 +65,17 @@ const AccountConfigs = () => {
         type: acctType,
         status: "active",
         ...(acctType === "monetary" && { amount: price }),
-        ...(acctType === "nft" && {
-          collection_name: selectedNft?.name,
-          collection_address: selectedNft?.address,
-          collection_image_url: selectedNft?.image,
-          collection_description: selectedNft?.description,
+        ...(acctType === "token gated" && {
+          token_id: selectedNft?.token_id,
+          token_name: selectedNft?.token_name,
+          token_decimals: selectedNft?.token_decimals,
+          minimum_token_balance: tokenBalance,
         }),
       };
 
       const { data } = await axios.put("/subscriptions/", reqData, {
         headers: {
-          Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          Authorization: `Signature ${userSignature}`,
         },
       });
 
@@ -147,8 +168,8 @@ const AccountConfigs = () => {
                 value: "monetary",
               },
               {
-                label: "NFT pass",
-                value: "nft",
+                label: "ASA Gating",
+                value: "token gated",
               },
             ].map((type, index) => {
               return (
@@ -229,7 +250,7 @@ const AccountConfigs = () => {
 
               <NoteText note="Note: 10% fee will be charged on every withdrawal" />
             </Fragment>
-          ) : acctType === "nft" ? (
+          ) : acctType === "token gated" ? (
             <Fragment>
               <Menu
                 style={{
@@ -287,7 +308,23 @@ const AccountConfigs = () => {
                     showsVerticalScrollIndicator={true}
                     showsHorizontalScrollIndicator={false}
                   >
-                    {nftCollections.map((nft, index) => {
+                    {[
+                      {
+                        token_decimals: 8,
+                        token_id: "12400859",
+                        token_name: "EURe",
+                      },
+                      {
+                        token_decimals: 5,
+                        token_id: "105371557",
+                        token_name: "MONT",
+                      },
+                      {
+                        token_decimals: 6,
+                        token_id: "14704676",
+                        token_name: "wALGOTs",
+                      },
+                    ].map((nft, index) => {
                       return (
                         <MenuOption
                           key={index}
@@ -298,7 +335,7 @@ const AccountConfigs = () => {
                               paddingVertical: 12,
                               paddingHorizontal: 16,
                               borderBottomWidth:
-                                index === nfts.length - 1 ? 0 : 1,
+                                index === ASAs.length - 1 ? 0 : 1,
                             },
                           }}
                         >
@@ -309,6 +346,35 @@ const AccountConfigs = () => {
                   </ScrollView>
                 </MenuOptions>
               </Menu>
+
+              <View
+                style={[
+                  styles.input_cover,
+                  {
+                    height: 46,
+                    borderWidth: 1,
+                    borderRadius: 14,
+                    borderColor: "#d8d8d8",
+                    // backgroundColor: "#f8f8f8",
+                  },
+                ]}
+              >
+                <BottomSheetTextInput
+                  value={tokenBalance}
+                  keyboardType="numeric"
+                  onChangeText={(text) => setTokenBalance(text)}
+                  style={[
+                    styles.priceInput,
+                    {
+                      fontSize: 14,
+                      color: "#000",
+                      fontFamily: "DMSans-Regular",
+                    },
+                  ]}
+                  placeholderTextColor={"#666"}
+                  placeholder="Minimum amount of token balance required"
+                />
+              </View>
 
               <NoteText note="Only subscribers with this NFT will be able to access your content" />
             </Fragment>

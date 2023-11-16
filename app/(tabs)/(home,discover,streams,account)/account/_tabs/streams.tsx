@@ -27,17 +27,17 @@ const AccountStreams = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery(
-    ["account-streams", userSignature?.publicKey],
+    ["account-streams", userSignature],
     async () =>
       axios
         .get("/contents/livestreams", {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.data?.results),
     {
-      enabled: !!userSignature?.signature,
+      enabled: !!userSignature,
     }
   );
 

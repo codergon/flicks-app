@@ -13,17 +13,17 @@ const AccountTransactons = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery(
-    ["account-txns", userSignature?.publicKey],
+    ["account-txns", userSignature],
     async () =>
       axios
         .get(`/transactions/`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.data?.results),
     {
-      enabled: !!userSignature?.signature,
+      enabled: !!userSignature,
     }
   );
 

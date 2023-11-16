@@ -62,12 +62,12 @@ const LiveStream = () => {
       axios
         .get(`/contents/livestreams/${streamData?.id}/join`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.data),
     {
-      enabled: !!userSignature?.signature && !!streamData?.id,
+      enabled: !!userSignature && !!streamData?.id,
     }
   );
 

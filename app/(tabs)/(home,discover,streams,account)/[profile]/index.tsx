@@ -61,7 +61,7 @@ const UserProfileHeader = ({
         undefined,
         {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         }
       );
@@ -291,6 +291,19 @@ const UserProfileHeader = ({
                     </Text>
                   </View>
                 )}
+
+                {userData?.subscription_type === "token gated" && (
+                  <View style={[styles.nftSubscription]}>
+                    <Text style={{ fontSize: 14.5 }}>
+                      {userData?.subscription_info?.minimum_token_balance}{" "}
+                      {userData?.subscription_info?.token_name} required
+                      <RgText style={{ fontSize: 13, color: "#666" }}>
+                        {" "}
+                        {"(ASA Gated)"}
+                      </RgText>
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>
@@ -374,17 +387,17 @@ const UserProfile = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data, refetch } = useQuery(
-    ["profile", userSignature?.publicKey, profile],
+    ["profile", userSignature, profile],
     async () =>
       axios
         .get(`/creators/${profile}`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.data),
     {
-      enabled: !!userSignature?.signature && !!profile,
+      enabled: !!userSignature && !!profile,
     }
   );
 

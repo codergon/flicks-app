@@ -15,17 +15,17 @@ const MediaGallery = ({ profile = "" }) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery(
-    ["profile-media", userSignature?.publicKey, profile],
+    ["profile-media", userSignature, profile],
     async () =>
       axios
         .get(`/contents/media/${profile}`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.data?.results),
     {
-      enabled: !!userSignature?.signature && !!profile,
+      enabled: !!userSignature && !!profile,
     }
   );
 

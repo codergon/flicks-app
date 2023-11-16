@@ -29,18 +29,18 @@ const Discover = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery(
-    ["discover-page", userSignature?.publicKey],
+    ["discover-page", userSignature],
     async () =>
       axios
         .get(`/contents/discover`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.data?.results),
     {
       refetchInterval: 1000 * 60 * 2, // refetch every 2 minutes
-      enabled: !!userSignature?.signature,
+      enabled: !!userSignature,
     }
   );
 

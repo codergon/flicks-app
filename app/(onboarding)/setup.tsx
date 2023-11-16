@@ -31,7 +31,7 @@ const AccountSetup = () => {
   const [selectedAvatar, setSelectedAvatar] = useState<string>("");
 
   const {
-    acctSNS,
+    acctANS,
     prepareUser,
     isCreatingAccount,
 
@@ -44,7 +44,7 @@ const AccountSetup = () => {
   } = useAccount();
 
   useEffect(() => {
-    setUseDomainName(!username && !!acctSNS);
+    setUseDomainName(!username && !!acctANS);
   }, [username]);
 
   return (
@@ -83,7 +83,7 @@ const AccountSetup = () => {
           <SelectAvatars setSelectedAvatar={setSelectedAvatar} />
 
           <View style={[styles.usernameContainer]}>
-            {acctSNS && (
+            {acctANS && (
               <Fragment>
                 <View
                   style={[
@@ -108,7 +108,7 @@ const AccountSetup = () => {
                         },
                       ]}
                     >
-                      Use your SNS (recommended)
+                      Use your ANS (recommended)
                     </RgText>
                     <RgText
                       style={[
@@ -117,7 +117,7 @@ const AccountSetup = () => {
                         },
                       ]}
                     >
-                      {acctSNS + ".sol"}
+                      {acctANS + ".algo"}
                     </RgText>
                   </View>
 
@@ -166,7 +166,7 @@ const AccountSetup = () => {
                   },
                 ]}
               >
-                {acctSNS ? "Or e" : "E"}nter your unique username
+                {acctANS ? "Or e" : "E"}nter your unique username
               </RgText>
 
               <View
@@ -262,8 +262,8 @@ const AccountSetup = () => {
               prepareUser({
                 bio,
                 image_url: selectedAvatar,
-                moniker: (useDomainName && acctSNS
-                  ? acctSNS
+                moniker: (useDomainName && acctANS
+                  ? acctANS
                   : username
                 )?.toLowerCase(),
               });

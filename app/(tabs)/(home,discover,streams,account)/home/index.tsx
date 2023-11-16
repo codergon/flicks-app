@@ -17,17 +17,17 @@ const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery(
-    ["timeline", userSignature?.publicKey],
+    ["timeline", userSignature],
     async () =>
       axios
         .get(`/contents/timeline`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.results),
     {
-      enabled: !!userSignature?.signature,
+      enabled: !!userSignature,
     }
   );
 

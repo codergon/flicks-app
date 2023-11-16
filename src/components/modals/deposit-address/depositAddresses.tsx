@@ -123,7 +123,7 @@ const DepositAddresses = ({
               <ChainItem
                 isPreferred
                 chain={userData?.wallet?.deposit_addresses.find(
-                  (c) => c.blockchain.toLowerCase() === "sol"
+                  (c) => c.blockchain.toLowerCase() === "algo"
                 )}
               />
             </View>
@@ -177,7 +177,7 @@ const DepositAddresses = ({
                 }}
               >
                 {userData?.wallet?.deposit_addresses
-                  .filter((c) => c.blockchain.toLowerCase() !== "sol")
+                  .filter((c) => c.blockchain.toLowerCase() !== "algo")
                   .map((chain, index) => {
                     return <ChainItem key={index} chain={chain} />;
                   })}

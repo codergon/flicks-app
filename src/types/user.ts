@@ -43,4 +43,7 @@ export interface SubscriptionInfo {
   collection_address?: string;
   collection_image?: string;
   collection_description?: string;
+
+  token_name?: string;
+  minimum_token_balance?: number;
 }

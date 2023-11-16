@@ -105,7 +105,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
 
   const [selectedMedia, setSelectedMedia] = useState<MediaType[]>([]);
 
-  const [[isLoadingSearches, recentSearches], setRecentSearches] =
+  const [[_, recentSearches], setRecentSearches] =
     useLargeStorageState<RecentSearches>("recentSearches");
 
   // push notifications
@@ -156,7 +156,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
           q: search,
         },
         headers: {
-          Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          Authorization: `Signature ${userSignature}`,
         },
       });
 
@@ -204,17 +204,17 @@ const AppProvider = ({ children }: AppProviderProps) => {
 
   // Fetch user's posts
   const usersPostQuery = useQuery(
-    ["account-posts", userSignature?.publicKey],
+    ["account-posts", userSignature],
     async () =>
       axios
-        .get(`/contents/creators/${userSignature?.publicKey}`, {
+        .get(`/contents/creators/${userSignature}`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         })
         .then((res) => res.data?.data?.results),
     {
-      enabled: !!userData?.address && !!userSignature?.publicKey,
+      enabled: !!userData?.address && !!userSignature,
     }
   );
 
@@ -407,7 +407,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
         },
         {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         }
       );
@@ -452,7 +452,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
       // Create content
       await axios.post("/contents/", contentData, {
         headers: {
-          Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          Authorization: `Signature ${userSignature}`,
         },
       });
 
@@ -503,13 +503,13 @@ const AppProvider = ({ children }: AppProviderProps) => {
       if (action === "like") {
         await axios.post(`/contents/${postId}/likes`, undefined, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         });
       } else {
         await axios.delete(`/contents/${postId}/likes`, {
           headers: {
-            Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+            Authorization: `Signature ${userSignature}`,
           },
         });
       }
@@ -534,7 +534,7 @@ const AppProvider = ({ children }: AppProviderProps) => {
       { message: comment },
       {
         headers: {
-          Authorization: `Signature ${userSignature?.publicKey}:${userSignature?.signature}`,
+          Authorization: `Signature ${userSignature}`,
         },
       }
     );
